@@ -1,0 +1,30 @@
+# Aggiorna ogni giorno dei dati nell'HTML da una fonte pubblica e fa commit solo se qualcosa è cambiato.
+# Copia in .github/workflows/aggiorna-dati.yml e scrivi lo script in .github/scripts/aggiorna.py
+# (legge la fonte, riscrive gli attributi data-* in index.html, non tocca niente se la fonte non risponde).
+name: Aggiorna dati
+
+on:
+  schedule:
+    - cron: "17 5 * * *"   # ogni giorno alle 5:17 UTC; evita il minuto 0, più congestionato
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aggiorna-dati
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/scripts/aggiorna.py
+      - name: Commit se è cambiato qualcosa
+        run: |
+          if git diff --quiet; then echo "Niente da aggiornare"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Dati aggiornati"
+          git push

@@ -1,0 +1,69 @@
+</style>
+</head>
+<body>
+<!-- Pagina generata da build.py: non modificare questo file a mano, modifica i contenuti nel CMS -->
+<a class="salta" href="#contenuto">Vai ai contenuti</a>
+<main class="pagina">
+
+  <section class="tempo" id="tempo" aria-labelledby="nome">
+    <div class="palco" id="palco">
+      <div class="strati" id="strati">
+        {{HERO_FOTO}}
+        <img class="scatto" id="scatto-b" alt="" hidden decoding="async">
+        <p class="palco-titolo" id="palco-titolo" aria-hidden="true"></p>
+      </div>
+      <div class="firma">
+        <h1 id="nome" translate="no">{{NOME}}</h1>
+        <p>{{SOTTOTITOLO}}</p>
+      </div>
+    </div>
+    <div class="pannello" id="pannello">
+      <div class="linea" id="linea" hidden></div>
+      <p class="istruzione" id="istruzione" hidden>Scorri la foto o trascina la linea</p>
+      <div class="pannello-testi" id="p-testi">
+        <div class="pannello-riga">
+          <p class="pannello-viaggio" id="p-viaggio">Oggi</p>
+          <p class="pannello-anno" id="p-anno">{{ANNO}}</p>
+        </div>
+        <p class="pannello-riga2" id="p-riga" data-predefinita="{{RIGA_OGGI_ATTR}}">{{RIGA_OGGI}}</p>
+        <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
+        <p class="pannello-frase" id="p-frase" hidden translate="no"></p>
+      </div>
+    </div>
+    <p class="sr" id="annuncio" aria-live="polite"></p>
+  </section>
+
+  <div class="contenuto" id="contenuto">
+    <section class="bio" aria-label="Chi sono">
+      <p class="bio-attacco">{{BIO_ATTACCO}}</p>
+      <p class="bio-resto">{{BIO}}</p>
+    </section>
+
+{{PARTENZE}}
+
+    <section class="sezione" aria-labelledby="t-fatti">
+      <h2 id="t-fatti">Dove sono già stato</h2>
+      <ol class="griglia" id="griglia">
+{{GRIGLIA}}
+      </ol>
+    </section>
+
+    <section class="sezione" aria-labelledby="t-contatti">
+      <h2 id="t-contatti">Contatti</h2>
+      <ul class="contatti">
+{{CONTATTI}}
+      </ul>
+    </section>
+
+    <footer class="piede">
+      {{MOTTO}}
+      <p>Pagina personale di <span translate="no">{{NOME}}</span>, non un canale ufficiale di Avventure nel Mondo.</p>
+    </footer>
+
+    <nav class="azioni" aria-label="Contatti rapidi">
+      {{AZIONE}}
+      <button class="azione quadrata" id="condividi" type="button" aria-label="Condividi la pagina"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+    </nav>
+  </div>
+</main>
+<script>

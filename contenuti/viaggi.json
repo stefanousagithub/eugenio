@@ -1,0 +1,110 @@
+[
+  {
+    "titolo": "Messico",
+    "anno": 2022,
+    "mese": 5,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#78351e",
+    "riga": "Yucatán, la piramide di Kukulkan a Chichén Itzá.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Jamaica Express",
+    "anno": 2023,
+    "mese": 2,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#15532f",
+    "riga": "Con Avventure nel Mondo, febbraio 2023.",
+    "frase": "Out of many, one people",
+    "scheda": ""
+  },
+  {
+    "titolo": "Cappadocia Discovery",
+    "anno": 2023,
+    "mese": 9,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#654119",
+    "riga": "Con Avventure nel Mondo, dal 15 al 22 settembre.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Tenerife",
+    "anno": 2024,
+    "mese": 7,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#882233",
+    "riga": "Dal 17 al 21 luglio, il Teide con gli amici.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Lofoten Discovery",
+    "anno": 2024,
+    "mese": 8,
+    "tour_leader": true,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#1f4a7c",
+    "riga": "Con Avventure nel Mondo, cod. 2505, dal 28 agosto al 5 settembre.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Thai Discovery",
+    "anno": 2025,
+    "mese": 2,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#145249",
+    "riga": "Con Avventure nel Mondo, dal 21 febbraio al 9 marzo.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Marrakech Discovery",
+    "anno": 2025,
+    "mese": 12,
+    "tour_leader": true,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#6e3c1b",
+    "riga": "Con Avventure nel Mondo, cod. 8366, dal 7 al 14 dicembre.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Camino de Santiago",
+    "anno": 2026,
+    "mese": 3,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#2e5214",
+    "riga": "Da Ponferrada a Santiago de Compostela, 208 km a piedi in dieci giorni.",
+    "frase": "",
+    "scheda": ""
+  },
+  {
+    "titolo": "Lanzarote",
+    "anno": 2026,
+    "mese": 4,
+    "tour_leader": false,
+    "foto": "",
+    "inquadratura": 50,
+    "colore": "#872522",
+    "riga": "Dal 14 al 18 aprile.",
+    "frase": "",
+    "scheda": ""
+  }
+]

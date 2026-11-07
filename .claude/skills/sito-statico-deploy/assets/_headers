@@ -1,0 +1,13 @@
+# Cloudflare Pages: copia questo file nella radice del sito con il nome _headers.
+# Le foto hanno cache di 30 giorni: se sostituisci una foto, cambiale nome (es. islanda-2.jpg)
+# altrimenti chi l'ha già vista continua a vedere la vecchia.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+
+/foto/*
+  Cache-Control: public, max-age=2592000
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

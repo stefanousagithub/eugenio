@@ -1,0 +1,95 @@
+# Configurazione di Pages CMS (app.pagescms.org): definisce cosa Eugenio può modificare e come.
+# Ogni salvataggio crea un commit su GitHub; il workflow "Pubblica il sito" rigenera il sito in circa un minuto.
+media:
+  input: foto/caricate
+  output: /foto/caricate
+  extensions: [jpg, jpeg, png, webp]
+  rename: safe
+
+settings:
+  commit:
+    identity: user
+    templates:
+      update: "Aggiornato {path} dal CMS"
+      create: "Aggiunto {path} dal CMS"
+
+content:
+  - name: profilo
+    label: Profilo
+    type: file
+    path: contenuti/profilo.json
+    format: json
+    operations: { delete: false }
+    fields:
+      - { name: nome, label: Nome, type: string, required: true }
+      - { name: sottotitolo, label: Riga sotto il nome, type: string, required: true, description: "Le parole «Avventure nel Mondo» diventano un link da sole." }
+      - { name: foto_oggi, label: Foto principale, type: image, description: "La foto che si vede aprendo il sito. Meglio verticale, con te ben visibile." }
+      - { name: descrizione_foto_oggi, label: Descrizione della foto, type: string, description: "Per chi non vede le immagini (es. «Sugli scogli al tramonto, con una tazza in mano»)." }
+      - { name: inquadratura_oggi, label: Inquadratura della foto, type: number, options: { min: 0, max: 100 }, description: "0 = mostra il lato sinistro della foto, 50 = centro, 100 = lato destro." }
+      - { name: riga_oggi, label: Riga di oggi, type: string, description: "Sotto «Oggi». La prossima partenza viene aggiunta in automatico." }
+      - { name: bio_attacco, label: Frase d'apertura, type: string, required: true }
+      - { name: bio, label: Chi sono, type: text }
+      - { name: motto, label: Motto in fondo alla pagina, type: string }
+      - { name: instagram, label: Nome utente Instagram, type: string, description: "Senza @." }
+      - { name: whatsapp, label: Numero WhatsApp, type: string, description: "Se lo inserisci, il pulsante principale diventa «Scrivimi su WhatsApp»." }
+      - { name: messaggio_whatsapp, label: Messaggio WhatsApp già scritto, type: string }
+      - { name: email, label: Email, type: string }
+      - { name: descrizione_sito, label: Descrizione per Google e per le anteprime dei link, type: text }
+      - { name: indirizzo_sito, label: Indirizzo del sito, type: string, description: "Es. https://eugeniolucarelli.it. Serve per l'anteprima del link su WhatsApp." }
+      - { name: online_su_google, label: Visibile su Google, type: boolean, description: "Lascia spento finché il sito non è pronto." }
+
+  - name: partenze
+    label: Prossime partenze
+    type: file
+    path: contenuti/partenze.json
+    format: json
+    list: true
+    fields:
+      - { name: titolo, label: Nome del viaggio, type: string, required: true, description: "Come sul sito di Avventure (es. Finlandia Aurore Boreali Discovery)." }
+      - { name: destinazione, label: Destinazione breve, type: string, required: true, description: "Quella grande sulla carta d'imbarco (es. Finlandia)." }
+      - { name: tappe, label: Tappe, type: string, description: "Es. Helsinki, Ivalo, Rovaniemi." }
+      - { name: da, label: Città di partenza, type: string, default: Roma }
+      - { name: dal, label: Partenza, type: date, required: true, options: { format: yyyy-MM-dd } }
+      - { name: al, label: Ritorno, type: date, required: true, options: { format: yyyy-MM-dd } }
+      - { name: codice, label: Codice partenza Avventure, type: string, description: "Le 4 cifre (es. 3597). Con il codice, iscritti e posti si aggiornano da soli ogni giorno." }
+      - { name: tour_leader, label: Sono il tour leader, type: boolean, default: true }
+      - { name: scheda, label: Link alla scheda del viaggio, type: string }
+      - { name: iscrizione, label: Link per iscriversi, type: string, description: "Il link del pulsante «Prenota» di quella data sul sito di Avventure." }
+      - { name: colore, label: Colore della carta d'imbarco, type: string, default: "#2b3caa", description: "Formato #RRGGBB, scuro (il testo sopra è bianco)." }
+      - { name: mostra_in_viaggio, label: Mostra «Adesso sono in viaggio» durante questo viaggio, type: boolean, default: false }
+      - { name: posti, label: Posti (solo se il codice non basta), type: number }
+      - { name: iscritti, label: Iscritti (solo se il codice non basta), type: number }
+
+  - name: viaggi
+    label: Viaggi fatti
+    type: file
+    path: contenuti/viaggi.json
+    format: json
+    list: true
+    fields:
+      - { name: titolo, label: Titolo, type: string, required: true }
+      - { name: anno, label: Anno, type: number, required: true, options: { min: 1990, max: 2100 } }
+      - name: mese
+        label: Mese
+        type: select
+        options:
+          values:
+            - { name: 1, label: Gennaio }
+            - { name: 2, label: Febbraio }
+            - { name: 3, label: Marzo }
+            - { name: 4, label: Aprile }
+            - { name: 5, label: Maggio }
+            - { name: 6, label: Giugno }
+            - { name: 7, label: Luglio }
+            - { name: 8, label: Agosto }
+            - { name: 9, label: Settembre }
+            - { name: 10, label: Ottobre }
+            - { name: 11, label: Novembre }
+            - { name: 12, label: Dicembre }
+      - { name: tour_leader, label: Ero il tour leader, type: boolean, default: false }
+      - { name: foto, label: Foto, type: image, description: "Una foto in cui ci sei tu. Viene ridimensionata e ripulita dai dati GPS in automatico." }
+      - { name: inquadratura, label: Inquadratura della foto, type: number, default: 50, options: { min: 0, max: 100 }, description: "0 = lato sinistro, 50 = centro, 100 = lato destro." }
+      - { name: colore, label: Colore (facoltativo), type: string, description: "Se lo lasci vuoto viene preso dalla foto." }
+      - { name: riga, label: Riga sotto il titolo, type: string, description: "Es. «Con Avventure nel Mondo, dal 7 al 14 dicembre.»" }
+      - { name: frase, label: Una tua frase su questo viaggio, type: string, description: "Facoltativa. Compare in corsivo." }
+      - { name: scheda, label: Link alla scheda del viaggio, type: string }
