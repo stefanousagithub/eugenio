@@ -35,7 +35,7 @@ document.querySelectorAll(".imbarco").forEach(li => {
     if (iscritti >= posti) stato = "Completo";
     else if (posti - iscritti <= 3) stato = "Quasi completo";
     else if (iscritti >= 3) { stato = "Confermato"; cls = "stato-ok"; }
-    li.querySelector("[data-stato]").innerHTML = `<strong class="${cls}">${stato}</strong><span>${iscritti} iscritti su ${posti}</span>`;
+    li.querySelector("[data-stato]").innerHTML = `<strong class="${cls}">${stato}</strong><span>${iscritti} ${iscritti === 1 ? "iscritto" : "iscritti"} su ${posti}</span>`;
     li.querySelector("[data-stato]").hidden = false;
     const info = li.querySelector("[data-info]"); if (info) info.hidden = true;
   }
