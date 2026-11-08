@@ -277,13 +277,13 @@ if (fatti.length >= 2) {
   else if (!ridotto) {
     // veloce, con un'accelerazione all'inizio e una frenata su «oggi»; poi la tappa futura si accende per un attimo
     linea.classList.add("lapse"); let i = 0; mostra(0);
-    const durata = k => { const t = k / Math.max(1, iOggi); return 140 + 130 * (1 - Math.sin(Math.PI * t)); };
+    const durata = k => { const t = k / Math.max(1, iOggi); return 340 + 320 * (1 - Math.sin(Math.PI * t)); };
     const passo = () => {
       i++; mostra(i);
       if (i < iOggi) timer = setTimeout(passo, durata(i));
       else { fermaLapse(); linea.querySelectorAll(".tacca-futura").forEach(t => t.classList.add("invito")); }
     };
-    timer = setTimeout(passo, 450);
+    timer = setTimeout(passo, 700);
   } else mostra(iOggi);
 }
 
