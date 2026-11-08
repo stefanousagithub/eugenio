@@ -48,7 +48,7 @@ if (sezPartenze && !document.querySelector(".imbarco")) sezPartenze.hidden = tru
 const tessere = [...document.querySelectorAll("#griglia > li")];
 const fatti = tessere.map(li => ({
   titolo: li.dataset.titolo, anno: +li.dataset.anno, mese: +li.dataset.mese || 1, guida: li.dataset.guida === "si",
-  c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug
+  c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug, video: li.dataset.video || ""
 }));
 const prossimo = futuri[0];
 const rigaBase = $("#p-riga").dataset.predefinita;
@@ -121,6 +121,7 @@ if (fatti.length >= 2) {
     $("#p-anno").textContent = v.anno;
     $("#p-riga").textContent = v.riga || "";
     $("#p-ruolo").hidden = !v.guida;
+    $("#p-video").hidden = !v.video;
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
   }
   let corrente = iOggi;
@@ -235,6 +236,24 @@ if (fatti.length >= 2) {
     }
   };
   palco.addEventListener("pointerup", lascia); palco.addEventListener("pointercancel", lascia);
+
+  // video: il lettore di Instagram si carica solo quando lo si apre, e si scarica alla chiusura
+  const schermo = $("#schermo"), contVideo = $("#schermo-video");
+  $("#p-video").addEventListener("click", () => {
+    const v = voci[corrente]; if (!v.video) return;
+    fermaLapse();
+    schermo.style.setProperty("--cv", v.c || coloreOggi);
+    $("#schermo-titolo").textContent = `${v.titolo}, ${v.anno}`;
+    $("#schermo-link").href = v.video;
+    const fr = document.createElement("iframe");
+    fr.src = v.video + "embed/"; fr.title = `Video di ${v.titolo}`;
+    fr.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; fr.loading = "eager";
+    contVideo.replaceChildren(fr);
+    schermo.showModal();
+  });
+  $("#schermo-chiudi").addEventListener("click", () => schermo.close());
+  schermo.addEventListener("click", e => { if (e.target === schermo) schermo.close(); });
+  schermo.addEventListener("close", () => { contVideo.replaceChildren(); $("#p-video").focus(); });
 
   // le tessere della griglia aprono quel viaggio sulla linea del tempo, con un link condivisibile (#nome-viaggio)
   const indicePerSlug = s => voci.findIndex(v => v.slug === s);

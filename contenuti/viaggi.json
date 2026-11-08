@@ -9,7 +9,9 @@
     "colore": "",
     "riga": "Yucatán, la piramide di Kukulkan a Chichén Itzá.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "",
+    "credito_foto": ""
   },
   {
     "titolo": "Jamaica Express",
@@ -21,7 +23,9 @@
     "colore": "",
     "riga": "Con Avventure nel Mondo, febbraio 2023.",
     "frase": "Out of many, one people",
-    "scheda": ""
+    "scheda": "",
+    "video": "",
+    "credito_foto": ""
   },
   {
     "titolo": "Cappadocia Discovery",
@@ -29,11 +33,13 @@
     "mese": 9,
     "tour_leader": false,
     "foto": "/foto/caricate/cappadocia-2023.jpg",
-    "inquadratura": 55,
+    "inquadratura": 50,
     "colore": "",
     "riga": "Con Avventure nel Mondo, dal 15 al 22 settembre.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/Cx3W3qdMjx4/",
+    "credito_foto": ""
   },
   {
     "titolo": "Tenerife",
@@ -45,7 +51,9 @@
     "colore": "",
     "riga": "Dal 17 al 21 luglio, il Teide con gli amici.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/C91sjmtuTC9/",
+    "credito_foto": ""
   },
   {
     "titolo": "Lofoten Discovery",
@@ -53,11 +61,13 @@
     "mese": 8,
     "tour_leader": true,
     "foto": "/foto/caricate/lofoten-2024.jpg",
-    "inquadratura": 55,
+    "inquadratura": 50,
     "colore": "",
     "riga": "Con Avventure nel Mondo, cod. 2505, dal 28 agosto al 5 settembre.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/C_7z6ynuo1r/",
+    "credito_foto": ""
   },
   {
     "titolo": "Thai Discovery",
@@ -65,11 +75,13 @@
     "mese": 2,
     "tour_leader": false,
     "foto": "/foto/caricate/thailandia-2025.jpg",
-    "inquadratura": 55,
+    "inquadratura": 50,
     "colore": "",
     "riga": "Con Avventure nel Mondo, dal 21 febbraio al 9 marzo.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/DHEhQ2HuP6g/",
+    "credito_foto": ""
   },
   {
     "titolo": "Marrakech Discovery",
@@ -77,11 +89,13 @@
     "mese": 12,
     "tour_leader": true,
     "foto": "/foto/caricate/marrakech-2025.jpg",
-    "inquadratura": 52,
+    "inquadratura": 40,
     "colore": "",
     "riga": "Con Avventure nel Mondo, cod. 8366, dal 7 al 14 dicembre.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/DSdISubDMzi/",
+    "credito_foto": ""
   },
   {
     "titolo": "Camino de Santiago",
@@ -89,11 +103,14 @@
     "mese": 3,
     "tour_leader": false,
     "foto": "/foto/caricate/camino-2026.jpg",
-    "inquadratura": 50,
+    "inquadratura": 48,
     "colore": "",
     "riga": "Da Ponferrada a Santiago de Compostela, 208 km a piedi in dieci giorni.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "https://www.instagram.com/reel/DWq-fOtDEhi/",
+    "credito_foto": "Alto de San Roque: foto di Marathoni62, CC BY-SA 3.0, da Wikimedia Commons",
+    "link_credito": "https://commons.wikimedia.org/wiki/File:Alto_san_roque2009.jpg"
   },
   {
     "titolo": "Lanzarote",
@@ -105,6 +122,8 @@
     "colore": "",
     "riga": "Dal 14 al 18 aprile.",
     "frase": "",
-    "scheda": ""
+    "scheda": "",
+    "video": "",
+    "credito_foto": ""
   }
 ]

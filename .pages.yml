@@ -93,3 +93,6 @@ content:
       - { name: riga, label: Riga sotto il titolo, type: string, description: "Es. «Con Avventure nel Mondo, dal 7 al 14 dicembre.»" }
       - { name: frase, label: Una tua frase su questo viaggio, type: string, description: "Facoltativa. Compare in corsivo." }
       - { name: scheda, label: Link alla scheda del viaggio, type: string }
+      - { name: video, label: Link al video (reel Instagram), type: string, description: "Facoltativo. Incolla il link del reel, es. https://www.instagram.com/reel/XXXX/. Sul sito compare il pulsante «Guarda il video»." }
+      - { name: credito_foto, label: Credito della foto, type: string, description: "Solo se la foto non è tua. Es. «Foto di Mario Rossi, CC BY 4.0». Compare in fondo alla pagina." }
+      - { name: link_credito, label: Link della foto originale, type: string, description: "Facoltativo: la pagina da cui viene la foto." }

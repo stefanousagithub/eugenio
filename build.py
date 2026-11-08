@@ -47,6 +47,18 @@ def slug(testo):
     return re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-") or "viaggio"
 
 
+def video_instagram(url, dove):
+    """Dal link di un reel o post Instagram ricava l'indirizzo del lettore incorporabile; '' se manca o non è valido."""
+    if not (url or "").strip():
+        return ""
+    m = re.search(r"instagram\.com/(?:[A-Za-z0-9_.]+/)?(reel|reels|p|tv)/([A-Za-z0-9_-]+)", url)
+    if not m:
+        avvisi.append(f"{dove}: il link del video «{url}» non sembra un reel o un post di Instagram, lo ignoro")
+        return ""
+    tipo = "reel" if m.group(1) in ("reel", "reels", "tv") else "p"
+    return f"https://www.instagram.com/{tipo}/{m.group(2)}/"
+
+
 def colore_valido(c):
     return bool(re.fullmatch(r"#[0-9a-fA-F]{6}", c or ""))
 
@@ -204,9 +216,10 @@ def main():
         info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
         colore = v.get("colore") or (info and info["colore"]) or "#2c2c2e"
         guida = "si" if v.get("tour_leader") else "no"
+        video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
         attr = (f'data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
                 f'data-guida="{guida}" data-c="{colore}" data-foto="{v["_slug"] if info else ""}" '
-                f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}"')
+                f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}" data-video="{e(video)}"')
         immagine = ""
         if info:
             immagine = (f'<picture><source srcset="foto/mini/{info["nome"]}.webp" type="image/webp"><img src="foto/mini/{info["nome"]}.jpg" '
@@ -215,6 +228,15 @@ def main():
         badge = '<span class="badge">Tour leader</span>' if v.get("tour_leader") else ""
         tessere.append(f'        <li {attr}><a class="tessera" href="#{v["_slug"]}" style="--c:{colore}">{badge}{immagine}'
                        f'<span class="didascalia"><b>{e(v["titolo"])}</b><span class="anno">{v["anno"]}</span></span></a></li>')
+
+    # crediti delle foto non di Eugenio
+    crediti = []
+    for v in viaggi:
+        if (v.get("credito_foto") or "").strip():
+            testo = e(v["credito_foto"].strip())
+            if (v.get("link_credito") or "").startswith("https://"):
+                testo = f'<a href="{e(v["link_credito"])}" target="_blank" rel="noopener">{testo}</a>'
+            crediti.append(testo)
 
     # partenze future: carta d'imbarco
     blocchi = []
@@ -314,6 +336,7 @@ def main():
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,
+        "CREDITI": f'<p class="piede-crediti">{"<br>".join(crediti)}</p>' if crediti else "",
     }
     m = RADICE / "modello"
     pagina = (m / "testa.html").read_text(encoding="utf-8") + (m / "stile.css").read_text(encoding="utf-8") \

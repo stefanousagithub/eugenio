@@ -26,7 +26,10 @@
           <p class="pannello-anno" id="p-anno">{{ANNO}}</p>
         </div>
         <p class="pannello-riga2" id="p-riga" data-predefinita="{{RIGA_OGGI_ATTR}}">{{RIGA_OGGI}}</p>
-        <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
+        <div class="pannello-extra">
+          <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
+          <button class="guarda" id="p-video" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>Guarda il video</button>
+        </div>
         <p class="pannello-frase" id="p-frase" hidden translate="no"></p>
       </div>
     </div>
@@ -58,6 +61,7 @@
     <footer class="piede">
       {{MOTTO}}
       <p>Pagina personale di <span translate="no">{{NOME}}</span>, non un canale ufficiale di Avventure nel Mondo.</p>
+      {{CREDITI}}
     </footer>
 
     <nav class="azioni" aria-label="Contatti rapidi">
@@ -66,4 +70,12 @@
     </nav>
   </div>
 </main>
+<dialog class="schermo" id="schermo" aria-labelledby="schermo-titolo">
+  <div class="schermo-testa">
+    <p class="schermo-titolo" id="schermo-titolo"></p>
+    <button class="schermo-chiudi" id="schermo-chiudi" type="button" aria-label="Chiudi il video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="schermo-video" id="schermo-video"></div>
+  <a class="schermo-link" id="schermo-link" href="#" target="_blank" rel="noopener">Apri su Instagram</a>
+</dialog>
 <script>
