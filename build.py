@@ -59,6 +59,23 @@ def video_instagram(url, dove):
     return f"https://www.instagram.com/{tipo}/{m.group(2)}/"
 
 
+def righe_tabellone(testo, larghezza=11, max_righe=3):
+    """Scritta del tabellone: righe da al massimo 11 caratteri. Con «/» le righe le decide chi scrive,
+    altrimenti si va a capo da soli tra una parola e l'altra (così una meta lunga allunga il tabellone)."""
+    if "/" in testo:
+        righe = [r.strip().upper() for r in testo.split("/") if r.strip()]
+    else:
+        righe, riga = [], ""
+        for parola in testo.upper().split():
+            if riga and len(riga) + 1 + len(parola) > larghezza:
+                righe.append(riga); riga = parola
+            else:
+                riga = f"{riga} {parola}".strip()
+        if riga:
+            righe.append(riga)
+    return [r[:larghezza] for r in righe][:max_righe] or [testo.upper()[:larghezza]]
+
+
 def colore_valido(c):
     return bool(re.fullmatch(r"#[0-9a-fA-F]{6}", c or ""))
 
@@ -250,8 +267,7 @@ def main():
         except (TypeError, ValueError):
             minimo = 3
         info_foto = foto(p.get("foto"), f"partenza-{slug(dest)}", f"Partenza {dest}")
-        righe = [r.strip().upper()[:11] for r in (p.get("tabellone") or dest).split("/") if r.strip()][:2]
-        righe = righe or [dest.upper()[:11]]
+        righe = righe_tabellone(p.get("tabellone") or dest)
         data_tab = f"{dal.day} {MESI[dal.month - 1][:3].upper()}"
         testa_tag, testa_fine = ("a", "</a>") if p.get("scheda") else ("div", "</div>")
         href = f' href="{e(p["scheda"])}" target="_blank" rel="noopener"' if p.get("scheda") else ""

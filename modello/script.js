@@ -73,7 +73,7 @@ if (fatti.length >= 2) {
   // posizioni: passo fisso, più spazio per gli anni saltati e prima di "oggi"
   let x = 0; const pos = [];
   voci.forEach((v, i) => {
-    if (i) { x += 1 + Math.max(0, v.anno - voci[i - 1].anno - 1) * .6; if (v.oggi || v.futuro) x += .25; }
+    if (i) { x += 1 + Math.max(0, v.anno - voci[i - 1].anno - 1) * .6; if (v.oggi) x += .25; if (v.futuro) x += 1.1; }
     pos.push(x);
   });
   voci.forEach((v, i) => v.x = 2 + pos[i] / (pos[pos.length - 1] || 1) * 96);
@@ -92,7 +92,7 @@ if (fatti.length >= 2) {
   voci.forEach((v, i) => {
     let testo = null, cls = "etichetta";
     if (v.oggi) testo = "oggi";
-    else if (v.futuro) { testo = fmtMese(v.data); cls += " futura"; }
+    else if (v.futuro) { testo = fmtBreve(v.data); cls += " futura" + (i === voci.length - 1 ? " ultima" : ""); }
     else if (v.anno !== annoVisto) { testo = String(v.anno); annoVisto = v.anno; }
     if (!testo) return;
     const e = document.createElement("span"); e.className = cls + (i === 0 ? " prima" : ""); e.textContent = testo;
@@ -277,7 +277,7 @@ if (fatti.length >= 2) {
   else if (!ridotto) {
     // veloce, con un'accelerazione all'inizio e una frenata su «oggi»; poi la tappa futura si accende per un attimo
     linea.classList.add("lapse"); let i = 0; mostra(0);
-    const durata = k => { const t = k / Math.max(1, iOggi); return 70 + 110 * (1 - Math.sin(Math.PI * t)); };
+    const durata = k => { const t = k / Math.max(1, iOggi); return 140 + 130 * (1 - Math.sin(Math.PI * t)); };
     const passo = () => {
       i++; mostra(i);
       if (i < iOggi) timer = setTimeout(passo, durata(i));

@@ -74,7 +74,7 @@ content:
       - { name: iscrizione, label: Link per iscriversi, type: string, description: "Il link del pulsante «Prenota» di quella data sul sito di Avventure." }
       - { name: colore, label: Colore della carta d'imbarco, type: string, default: "#2b3caa", description: "Formato #RRGGBB, scuro (il testo sopra è bianco)." }
       - { name: foto, label: Foto di sfondo della carta d'imbarco, type: image, description: "Facoltativa. Un paesaggio della destinazione." }
-      - { name: tabellone, label: Scritta del tabellone, type: string, description: "Facoltativa. Le righe si separano con /, al massimo 11 lettere per riga (es. FINLANDIA/AURORE). Se vuota si usa la destinazione." }
+      - { name: tabellone, label: Scritta del tabellone, type: string, description: "Facoltativa. Se vuota si usa la destinazione. Va a capo da sola tra le parole (al massimo 11 lettere per riga); con / scegli tu dove andare a capo." }
       - { name: minimo, label: Iscritti minimi per partire, type: number, default: 3, description: "Sotto questo numero la carta dice «Si parte con N iscritti»." }
       - { name: mostra_in_viaggio, label: Mostra «Adesso sono in viaggio» durante questo viaggio, type: boolean, default: false }
       - { name: posti, label: Posti (solo se il codice non basta), type: number }
