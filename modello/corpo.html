@@ -29,6 +29,7 @@
         <div class="pannello-extra">
           <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
           <button class="guarda" id="p-video" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>Guarda il video</button>
+          <a class="guarda" id="p-partenza" href="#partenze" hidden>Vedi la carta d'imbarco</a>
         </div>
         <p class="pannello-frase" id="p-frase" hidden translate="no"></p>
       </div>
@@ -40,9 +41,12 @@
     <section class="bio" aria-label="Chi sono">
       <p class="bio-attacco">{{BIO_ATTACCO}}</p>
       <p class="bio-resto">{{BIO}}</p>
+      <p class="bio-numeri">{{NUMERI}}</p>
     </section>
 
 {{PARTENZE}}
+
+{{RECENSIONI}}
 
     <section class="sezione" aria-labelledby="t-fatti">
       <h2 id="t-fatti">Dove sono già stato</h2>
@@ -50,6 +54,8 @@
 {{GRIGLIA}}
       </ol>
     </section>
+
+{{DOMANDE}}
 
     <section class="sezione" aria-labelledby="t-contatti">
       <h2 id="t-contatti">Contatti</h2>

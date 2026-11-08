@@ -37,6 +37,23 @@ content:
       - { name: descrizione_sito, label: Descrizione per Google e per le anteprime dei link, type: text }
       - { name: indirizzo_sito, label: Indirizzo del sito, type: string, description: "Es. https://eugeniolucarelli.it. Serve per l'anteprima del link su WhatsApp." }
       - { name: online_su_google, label: Visibile su Google, type: boolean, description: "Lascia spento finché il sito non è pronto." }
+      - name: recensioni
+        label: Dal gruppo (frasi di chi ha viaggiato con te)
+        type: object
+        list: true
+        description: "2 o 3 frasi vere, scritte da partecipanti. Se la lista è vuota la sezione non compare."
+        fields:
+          - { name: testo, label: Frase, type: text, required: true }
+          - { name: nome, label: Nome di battesimo, type: string, required: true }
+          - { name: viaggio, label: Viaggio e anno, type: string, description: "Es. Marrakech Discovery 2025." }
+      - name: domande
+        label: Com'è viaggiare con me (domande e risposte)
+        type: object
+        list: true
+        description: "3 o 4 domande che ti fanno prima di iscriversi, con la tua risposta. Se la lista è vuota la sezione non compare."
+        fields:
+          - { name: domanda, label: Domanda, type: string, required: true }
+          - { name: risposta, label: Risposta, type: text, required: true }
 
   - name: partenze
     label: Prossime partenze
@@ -56,6 +73,9 @@ content:
       - { name: scheda, label: Link alla scheda del viaggio, type: string }
       - { name: iscrizione, label: Link per iscriversi, type: string, description: "Il link del pulsante «Prenota» di quella data sul sito di Avventure." }
       - { name: colore, label: Colore della carta d'imbarco, type: string, default: "#2b3caa", description: "Formato #RRGGBB, scuro (il testo sopra è bianco)." }
+      - { name: foto, label: Foto di sfondo della carta d'imbarco, type: image, description: "Facoltativa. Un paesaggio della destinazione." }
+      - { name: tabellone, label: Scritta del tabellone, type: string, description: "Facoltativa. Le righe si separano con /, al massimo 11 lettere per riga (es. FINLANDIA/AURORE). Se vuota si usa la destinazione." }
+      - { name: minimo, label: Iscritti minimi per partire, type: number, default: 3, description: "Sotto questo numero la carta dice «Si parte con N iscritti»." }
       - { name: mostra_in_viaggio, label: Mostra «Adesso sono in viaggio» durante questo viaggio, type: boolean, default: false }
       - { name: posti, label: Posti (solo se il codice non basta), type: number }
       - { name: iscritti, label: Iscritti (solo se il codice non basta), type: number }
@@ -87,6 +107,7 @@ content:
             - { name: 11, label: Novembre }
             - { name: 12, label: Dicembre }
       - { name: tour_leader, label: Ero il tour leader, type: boolean, default: false }
+      - { name: paese, label: Paese, type: string, description: "Serve per contare i paesi visitati (es. Spagna anche per Tenerife)." }
       - { name: foto, label: Foto, type: image, description: "Una foto in cui ci sei tu. Viene ridimensionata e ripulita dai dati GPS in automatico." }
       - { name: inquadratura, label: Inquadratura della foto, type: number, default: 50, options: { min: 0, max: 100 }, description: "0 = lato sinistro, 50 = centro, 100 = lato destro." }
       - { name: colore, label: Colore (facoltativo), type: string, description: "Se lo lasci vuoto viene preso dalla foto." }

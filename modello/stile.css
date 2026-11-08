@@ -59,6 +59,9 @@ img{display:block}
 .tacca.guida{background:var(--accento)}
 .tacca-futura{position:absolute;top:6px;width:21px;height:21px;margin-left:-10.5px;display:grid;place-items:center;pointer-events:none}
 .tacca-futura::before{content:"";width:9px;height:9px;border-radius:50%;border:2px solid var(--accento);background:var(--cv)}
+.tacca-futura::after{content:"";position:absolute;inset:3px;border-radius:50%;border:2px solid var(--accento);opacity:0}
+.tacca-futura.invito::after{animation:invito 1.2s var(--ease-out) 2}
+@keyframes invito{from{transform:scale(.6);opacity:.9}to{transform:scale(1.9);opacity:0}}
 .cursore{position:absolute;top:5px;width:23px;height:23px;margin-left:-11.5px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:left .22s var(--ease-out)}
 .linea.trascina .cursore,.linea.lapse .cursore{transition:left .08s linear}
 .cursore:focus-visible{outline-offset:1px;border-radius:50%}
@@ -104,6 +107,32 @@ img{display:block}
 .imb-citta small{display:block;margin-bottom:6px;font:500 13px/1 var(--font);letter-spacing:0;color:rgba(255,255,255,.72)}
 .imb-tratta{position:relative;height:2px;margin-top:19px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 6px,transparent 6px 11px)}
 .imb-tratta::after{content:"";position:absolute;right:-1px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accento)}
+/* carta con foto: la foto della destinazione dietro, sfumata nel colore della carta */
+.imb-testa{position:relative;isolation:isolate;overflow:hidden}
+.imb-sfondo{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover}
+.con-foto .imb-testa::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,rgba(0,0,0,.42),rgba(0,0,0,.18) 38%,color-mix(in srgb,var(--c) 70%,rgba(0,0,0,.6)) 78%,var(--c))}
+.imb-conto{display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.imb-conto svg{width:16px;height:16px;opacity:.8}
+
+/* tabellone a palette: celle scure con la riga del cardine; ogni cambio di lettera è un foglio che cade */
+.tabellone{display:flex;flex-direction:column;gap:4px;margin-top:14px;perspective:400px}
+.tabellone.piccolo{margin-top:16px}
+.tab-riga{display:flex;gap:3px}
+.cella{position:relative;display:grid;place-items:center;width:clamp(23px,7vw,34px);height:clamp(32px,9.6vw,46px);border-radius:5px;background:linear-gradient(#232326 50%,#1b1b1d 50%);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);color:#f5f5f7;font:700 clamp(18px,5.6vw,27px)/1 var(--font-titoli);letter-spacing:0;transform-style:preserve-3d}
+.cella::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.65)}
+.cella span{display:block;backface-visibility:hidden}
+.cella.gira span{animation:foglio .1s cubic-bezier(.3,0,.6,1)}
+@keyframes foglio{from{transform:rotateX(70deg);opacity:.35}to{transform:none;opacity:1}}
+.tabellone.piccolo .cella{width:clamp(17px,5vw,23px);height:clamp(23px,6.8vw,31px);font-size:clamp(13px,4vw,18px);border-radius:4px}
+
+/* rotta: Roma e destinazione unite da un arco; l'aereo la percorre una volta */
+.imb-rotta{grid-template-columns:auto minmax(0,1fr) auto;align-items:end;margin-top:20px}
+.imb-volo{display:block;width:100%;height:44px;overflow:visible}
+.volo-traccia{fill:none;stroke:rgba(255,255,255,.5);stroke-width:1.6;stroke-dasharray:3 5;stroke-linecap:round}
+.volo-fatto{fill:none;stroke:rgba(255,255,255,.95);stroke-width:1.8;stroke-linecap:round}
+.volo-arrivo{fill:var(--accento)}
+.volo-aereo{fill:#fff}
+.imb-rotta .imb-citta{font-size:28px}
 .imb-campi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
 .imb-campi .dt{display:block;font-size:13px;color:rgba(255,255,255,.72)}
 .imb-campi .dd{display:block;margin-top:2px;font:600 17px/1.2 var(--font);font-variant-numeric:tabular-nums}
@@ -120,6 +149,27 @@ img{display:block}
 .imb-stato strong{display:block;font:600 15px/1.2 var(--font)}
 .imb-stato span{font-size:14px;color:var(--testo-2);font-variant-numeric:tabular-nums}
 .stato-ok{color:var(--verde)}
+.stato-attesa{color:var(--testo)}
+.imb-posti{flex-wrap:wrap}
+
+/* numeri sotto la bio */
+.bio-numeri{margin-top:10px;font:600 15px/1.3 var(--font);color:var(--accento-testo);font-variant-numeric:tabular-nums}
+
+/* dal gruppo: frasi vere di chi ha viaggiato con lui */
+.gruppo{list-style:none;display:grid;gap:10px;margin-top:12px}
+.voce-gruppo{padding:16px 18px;border-radius:18px;background:var(--scheda)}
+.voce-gruppo blockquote{font:italic 400 19px/1.4 var(--font-motto);letter-spacing:0;text-wrap:pretty}
+.voce-gruppo .chi{margin-top:10px;font-size:14px;color:var(--testo-2)}
+.voce-gruppo .chi b{color:var(--testo);font-weight:600}
+
+/* domande: righe come nelle Impostazioni, si aprono al tocco */
+.domande{margin-top:12px;border-radius:18px;overflow:hidden;background:var(--scheda)}
+.domanda+.domanda{border-top:.5px solid var(--sep)}
+.domanda summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:14px 18px;font-weight:600;cursor:pointer;list-style:none}
+.domanda summary::-webkit-details-marker{display:none}
+.domanda summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--testo-2);border-bottom:2px solid var(--testo-2);transform:translateY(-2px) rotate(45deg);transition:transform .2s var(--ease-out)}
+.domanda[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+.domanda p{padding:0 18px 16px;color:var(--testo-2);text-wrap:pretty}
 .prova{display:inline-block;margin-left:6px;padding:3px 7px;border-radius:999px;background:var(--tinta);color:var(--testo-2);font:600 11px/1 var(--font);vertical-align:2px}
 .imb-azioni{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .pill{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:999px;background:var(--tinta);color:var(--testo);font:600 15px/1 var(--font);-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out)}
@@ -198,4 +248,5 @@ html{scroll-padding-bottom:110px}
 @media (prefers-reduced-motion:reduce){
   .palco,.pannello,.cursore,.tessera,.azione,.pill,.scatto,.palco-titolo,.guarda{transition-duration:.01ms!important}
   .schermo[open]{animation:none}
+  .cella.gira span,.tacca-futura.invito::after{animation:none}
 }

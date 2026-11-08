@@ -31,15 +31,15 @@ document.querySelectorAll(".imbarco").forEach(li => {
       if (i % 6 === 3) cab.append(document.createElement("b"));
       const s = document.createElement("i"); if (i < iscritti) s.className = "preso"; cab.append(s);
     }
-    let stato = "Iscrizioni aperte", cls = "";
-    if (iscritti >= posti) stato = "Completo";
-    else if (posti - iscritti <= 3) stato = "Quasi completo";
-    else if (iscritti >= 3) { stato = "Confermato"; cls = "stato-ok"; }
-    li.querySelector("[data-stato]").innerHTML = `<strong class="${cls}">${stato}</strong><span>${iscritti} ${iscritti === 1 ? "iscritto" : "iscritti"} su ${posti}</span>`;
-    li.querySelector("[data-stato]").hidden = false;
-    const info = li.querySelector("[data-info]"); if (info) info.hidden = true;
+    // stesse parole del sito di Avventure: sotto il minimo «Si parte con N iscritti», poi Confermato, Quasi completo, Completo
+    const minimo = +d.minimo || 3;
+    let stato = `Si parte con ${minimo} iscritti`, cls = "stato-attesa";
+    if (iscritti >= posti) { stato = "Completo"; cls = ""; }
+    else if (iscritti >= minimo && posti - iscritti <= 3) { stato = "Quasi completo"; cls = ""; }
+    else if (iscritti >= minimo) { stato = "Confermato"; cls = "stato-ok"; }
+    li.querySelector("[data-stato]").innerHTML = `<strong class="${cls}">${stato}</strong><span>${iscritti} ${iscritti === 1 ? "iscritto" : "iscritti"} su ${posti}${d.codice ? ` · cod.${NBSP}${d.codice}` : ""}</span>`;
   }
-  futuri.push({ titolo: d.destinazione, data: dal, guida: d.guida === "si", c: d.c, mancano, slug: d.slug });
+  futuri.push({ titolo: d.destinazione, data: dal, guida: d.guida === "si", c: d.c, mancano, slug: d.slug, foto: d.foto || "" });
 });
 const sezPartenze = $("#partenze");
 if (sezPartenze && !document.querySelector(".imbarco")) sezPartenze.hidden = true;
@@ -62,7 +62,7 @@ $("#p-riga").textContent = rigaOggi;
 const voci = [...fatti,
   { titolo: "Oggi", anno: oggi.getFullYear(), oggi: true, riga: rigaOggi, c: null },
   ...futuri.map(f => ({ titolo: f.titolo, anno: f.data.getFullYear(), futuro: true, data: f.data, guida: f.guida, c: f.c, slug: f.slug,
-    riga: `Parto il ${fmtLungo(f.data)}${f.guida ? ", da tour leader" : ""}.` }))];
+    foto: f.foto, pos: "50", riga: `Prossima tappa: parto il ${fmtLungo(f.data)}${f.guida ? ", da tour leader" : ""}.` }))];
 const iOggi = voci.findIndex(v => v.oggi);
 
 if (fatti.length >= 2) {
@@ -122,6 +122,7 @@ if (fatti.length >= 2) {
     $("#p-riga").textContent = v.riga || "";
     $("#p-ruolo").hidden = !v.guida;
     $("#p-video").hidden = !v.video;
+    $("#p-partenza").hidden = !v.futuro;
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
   }
   let corrente = iOggi;
@@ -274,11 +275,91 @@ if (fatti.length >= 2) {
   const iniziale = location.hash ? indicePerSlug(decodeURIComponent(location.hash.slice(1))) : -1;
   if (iniziale >= 0) mostra(iniziale);
   else if (!ridotto) {
+    // veloce, con un'accelerazione all'inizio e una frenata su «oggi»; poi la tappa futura si accende per un attimo
     linea.classList.add("lapse"); let i = 0; mostra(0);
-    const passo = () => { i++; mostra(i); if (i < iOggi) timer = setTimeout(passo, 300); else fermaLapse(); };
-    timer = setTimeout(passo, 700);
+    const durata = k => { const t = k / Math.max(1, iOggi); return 70 + 110 * (1 - Math.sin(Math.PI * t)); };
+    const passo = () => {
+      i++; mostra(i);
+      if (i < iOggi) timer = setTimeout(passo, durata(i));
+      else { fermaLapse(); linea.querySelectorAll(".tacca-futura").forEach(t => t.classList.add("invito")); }
+    };
+    timer = setTimeout(passo, 450);
   } else mostra(iOggi);
 }
+
+/* ---------------- carta d'imbarco: tabellone a palette e volo ---------------- */
+// le lettere scorrono in ordine come su un tabellone delle partenze, poi si fermano; l'aereo percorre la rotta.
+// Parte una volta sola, quando la carta entra nello schermo. Con «riduci movimento» tutto è già al suo posto.
+const ALFABETO = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function preparaTabellone(el) {
+  const righe = el.dataset.flap.split("/"), larg = Math.max(...righe.map(r => r.length));
+  el.textContent = "";
+  const celle = [];
+  righe.forEach(r => {
+    const riga = document.createElement("span"); riga.className = "tab-riga";
+    [...r.padEnd(larg)].forEach(ch => {
+      const c = document.createElement("span"), t = document.createElement("span");
+      c.className = "cella"; t.textContent = ridotto ? ch.trim() : "";
+      c.append(t); riga.append(c); celle.push({ c, t, fine: ch });
+    });
+    el.append(riga);
+  });
+  return celle;
+}
+function giraTabellone(celle, ritardo = 0) {
+  if (ridotto) return;
+  celle.forEach(({ c, t, fine }, k) => {
+    const arrivo = Math.max(0, ALFABETO.indexOf(fine.toUpperCase()));
+    const giri = fine === " " ? 2 : 5 + (k % 5) + Math.floor(Math.random() * 4);
+    let n = 0;
+    const tick = () => {
+      n++;
+      const ch = n >= giri ? fine : ALFABETO[(arrivo - giri + n + ALFABETO.length * 3) % ALFABETO.length];
+      t.textContent = ch.trim();
+      c.classList.remove("gira"); void c.offsetWidth; c.classList.add("gira");
+      if (n < giri) setTimeout(tick, 62);
+    };
+    setTimeout(tick, ritardo + k * 28);
+  });
+}
+function preparaVolo(svg) {
+  const traccia = svg.querySelector(".volo-traccia"), fatto = svg.querySelector(".volo-fatto");
+  const arrivo = svg.querySelector(".volo-arrivo"), aereo = svg.querySelector(".volo-aereo");
+  const FINE = .86; let p = ridotto ? FINE : 0;
+  const disegna = () => {
+    const w = svg.clientWidth || 120, h = svg.clientHeight || 44;
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    const d = `M 8 ${h - 9} Q ${w / 2} ${-h * .5} ${w - 8} ${h - 9}`;
+    traccia.setAttribute("d", d); fatto.setAttribute("d", d);
+    arrivo.setAttribute("cx", w - 8); arrivo.setAttribute("cy", h - 9);
+    const L = traccia.getTotalLength();
+    fatto.style.strokeDasharray = L; fatto.style.strokeDashoffset = L * (1 - p);
+    const a = traccia.getPointAtLength(L * p), b = traccia.getPointAtLength(Math.min(L, L * p + 1)), z = traccia.getPointAtLength(Math.max(0, L * p - 1));
+    aereo.setAttribute("transform", `translate(${a.x} ${a.y}) rotate(${Math.atan2(b.y - z.y, b.x - z.x) * 180 / Math.PI})`);
+  };
+  disegna();
+  addEventListener("resize", disegna);
+  return (ritardo = 0) => {
+    if (ridotto) return;
+    const t0 = performance.now() + ritardo, dur = 2200;
+    const frame = now => {
+      const t = Math.min(1, Math.max(0, (now - t0) / dur));
+      p = FINE * (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2); // ease-in-out: decollo e atterraggio dolci
+      disegna(); if (t < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  };
+}
+document.querySelectorAll(".imbarco").forEach(li => {
+  const tabelloni = [...li.querySelectorAll("[data-flap]")].map(preparaTabellone);
+  const svg = li.querySelector("[data-volo]"), vola = svg ? preparaVolo(svg) : () => {};
+  const parti = () => { tabelloni.forEach((c, i) => giraTabellone(c, i * 260)); vola(500); };
+  if (!("IntersectionObserver" in window)) { parti(); return; }
+  const oss = new IntersectionObserver(voci => {
+    if (voci.some(v => v.isIntersecting)) { oss.disconnect(); parti(); }
+  }, { threshold: .45 });
+  oss.observe(li);
+});
 
 /* ---------------- condividi ---------------- */
 const btn = $("#condividi");

@@ -13,6 +13,9 @@
     "colore": "#2b3caa",
     "posti": null,
     "iscritti": null,
-    "mostra_in_viaggio": false
+    "mostra_in_viaggio": false,
+    "foto": "/foto/caricate/finlandia-aurora.jpg",
+    "tabellone": "FINLANDIA/AURORE",
+    "minimo": 3
   }
 ]

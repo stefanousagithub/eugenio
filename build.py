@@ -238,18 +238,27 @@ def main():
                 testo = f'<a href="{e(v["link_credito"])}" target="_blank" rel="noopener">{testo}</a>'
             crediti.append(testo)
 
-    # partenze future: carta d'imbarco
+    # partenze future: carta d'imbarco con tabellone a palette e rotta
     blocchi = []
     for p in future:
         dal, al = p["_dal"], p["_al"]
         dest = p.get("destinazione") or p.get("titolo")
         posti = p.get("posti") or ""
         iscr = p.get("iscritti") if p.get("iscritti") not in (None, "") else ""
+        try:
+            minimo = max(1, int(p.get("minimo") or 3))
+        except (TypeError, ValueError):
+            minimo = 3
+        info_foto = foto(p.get("foto"), f"partenza-{slug(dest)}", f"Partenza {dest}")
+        righe = [r.strip().upper()[:11] for r in (p.get("tabellone") or dest).split("/") if r.strip()][:2]
+        righe = righe or [dest.upper()[:11]]
+        data_tab = f"{dal.day} {MESI[dal.month - 1][:3].upper()}"
         testa_tag, testa_fine = ("a", "</a>") if p.get("scheda") else ("div", "</div>")
         href = f' href="{e(p["scheda"])}" target="_blank" rel="noopener"' if p.get("scheda") else ""
-        info = (f'<p class="imb-info" data-info>'
-                f'{"<span>Codice <b>" + e(p["codice"]) + "</b></span>" if p.get("codice") else ""}'
-                f'<span><b>{(al - dal).days + 1}</b> giorni</span></p>')
+        sfondo = ""
+        if info_foto:
+            sfondo = (f'<picture><source srcset="foto/{info_foto["nome"]}.webp" type="image/webp"><img class="imb-sfondo" '
+                      f'src="foto/{info_foto["nome"]}.jpg" width="{info_foto["w"]}" height="{info_foto["h"]}" alt="" loading="lazy" decoding="async"></picture>')
         iscriviti = (f'<a class="pill pieno" href="{e(p["iscrizione"])}" target="_blank" rel="noopener" '
                      f'aria-label="Iscriviti a {e(p.get("titolo") or dest)} del {dal.day} {MESI[dal.month - 1]}, sul sito di Avventure">Iscriviti</a>'
                      if p.get("iscrizione") else "")
@@ -257,30 +266,41 @@ def main():
             f'Ciao Eugenio, vorrei info su {p.get("titolo") or dest} del {dal.day} {MESI[dal.month - 1]}'
             f'{" (cod. " + p["codice"] + ")" if p.get("codice") else ""}')
             if profilo.get("whatsapp") else f'https://ig.me/m/{e(profilo.get("instagram", ""))}')
-        blocchi.append(f'''        <li class="imbarco" data-slug="{slug(dest)}" data-destinazione="{e(dest)}" data-dal="{dal}" data-al="{al}"
-            data-guida="{"si" if p.get("tour_leader") else "no"}" data-posti="{posti}" data-iscritti="{iscr}"
+        durata = (al - dal).days + 1
+        freccia = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" '
+                   'stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>') if p.get("scheda") else ""
+        tappe = f'<span class="imb-tappe">{e(p["tappe"])}</span>' if p.get("tappe") else ""
+        guida = "si" if p.get("tour_leader") else "no"
+        ruolo_dt = "Tour leader" if p.get("tour_leader") else "Ruolo"
+        ruolo_dd = "Eugenio" if p.get("tour_leader") else "Partecipante"
+        aereo = ('<g class="volo-aereo"><path d="M-7-1.2H3L8-.4Q9.6 0 8 .4L3 1.2H-7L-9 4.5H-10.5L-9.2 0-10.5-4.5H-9Z"/>'
+                 '<path d="M-1.5-1H2.5L-3.5-8.5H-5.5ZM-1.5 1H2.5L-3.5 8.5H-5.5Z"/></g>')
+        blocchi.append(f'''        <li class="imbarco{' con-foto' if info_foto else ''}" data-slug="{slug(dest)}" data-destinazione="{e(dest)}" data-dal="{dal}" data-al="{al}"
+            data-guida="{guida}" data-posti="{posti}" data-iscritti="{iscr}" data-minimo="{minimo}" data-codice="{e(p.get('codice') or '')}" data-foto="{info_foto["nome"] if info_foto else ""}"
             data-in-viaggio="{"si" if p.get("mostra_in_viaggio") else "no"}" data-c="{p["colore"]}" style="--c:{p["colore"]}">
           <{testa_tag} class="imb-testa"{href}>
-            <span class="imb-sopra"><span>Avventure nel Mondo</span><span class="imb-conto" data-conto>{dal.day} {MESI[dal.month - 1]}</span></span>
+            {sfondo}
+            <span class="imb-sopra"><span>Avventure nel Mondo</span><span class="imb-conto"><span data-conto>{dal.day} {MESI[dal.month - 1]}</span>{freccia}</span></span>
+            <span class="sr">{e(p.get("titolo") or dest)}, partenza il {dal.day} {MESI[dal.month - 1]} {dal.year}</span>
+            <span class="tabellone piccolo" data-flap="{e(data_tab)}" aria-hidden="true">{e(data_tab)}</span>
+            <span class="tabellone" data-flap="{e("/".join(righe))}" aria-hidden="true">{"<br>".join(e(r) for r in righe)}</span>
             <span class="imb-rotta">
               <span class="imb-citta"><small>Da</small>{e(p.get("da") or "Roma")}</span>
-              <span class="imb-tratta" aria-hidden="true"></span>
+              <svg class="imb-volo" data-volo aria-hidden="true"><path class="volo-traccia"/><path class="volo-fatto"/><circle class="volo-arrivo" r="4.5"/>{aereo}</svg>
               <span class="imb-citta"><small>A</small>{e(dest)}</span>
             </span>
-            {f'<span class="imb-tappe">{e(p["tappe"])}</span>' if p.get("tappe") else ""}
+            {tappe}
             <span class="imb-campi" role="list">
-              <span role="listitem"><span class="dt">Partenza</span><span class="dd" data-data="dal">{dal.day} {MESI[dal.month - 1][:3]}</span></span>
               <span role="listitem"><span class="dt">Ritorno</span><span class="dd" data-data="al">{al.day} {MESI[al.month - 1][:3]}</span></span>
-              <span role="listitem"><span class="dt">{"Tour leader" if p.get("tour_leader") else "Ruolo"}</span><span class="dd">{"Eugenio" if p.get("tour_leader") else "Partecipante"}</span></span>
+              <span role="listitem"><span class="dt">Durata</span><span class="dd">{durata} giorni</span></span>
+              <span role="listitem"><span class="dt">{ruolo_dt}</span><span class="dd">{ruolo_dd}</span></span>
             </span>
-            {'<span class="imb-scheda">Scheda del viaggio</span>' if p.get("scheda") else ""}
           {testa_fine}
           <div class="strappo" aria-hidden="true"></div>
           <div class="imb-tallone">
             <div class="imb-posti">
               <span class="cabina" data-cabina aria-hidden="true" hidden></span>
-              {info}
-              <p class="imb-stato" data-stato hidden></p>
+              <p class="imb-stato" data-stato><strong>Si parte con {minimo} iscritti</strong>{"<span>Cod. " + e(p["codice"]) + "</span>" if p.get("codice") else ""}</p>
             </div>
             <div class="imb-azioni">
               {iscriviti}
@@ -294,6 +314,34 @@ def main():
         partenze_html = (f'    <section class="sezione" id="partenze" aria-labelledby="t-partenze">\n'
                          f'      <h2 id="t-partenze">{titolo_sez}</h2>\n      <ul class="imbarchi">\n'
                          + "\n".join(blocchi) + "\n      </ul>\n    </section>")
+
+    # numeri: si calcolano dai dati, quindi sono sempre veri
+    paesi = {(v.get("paese") or "").strip().lower() for v in viaggi}
+    n_guida = sum(1 for v in viaggi if v.get("tour_leader"))
+    numeri = f"{len(viaggi)} viaggi"
+    if "" not in paesi and len(paesi) > 1:
+        numeri += f" in {len(paesi)} paesi"
+    if n_guida:
+        numeri += f", {n_guida} da tour leader"
+
+    # «Dal gruppo» (frasi vere di partecipanti) e domande: le sezioni compaiono solo se ci sono contenuti
+    rec = [r for r in profilo.get("recensioni") or [] if (r.get("testo") or "").strip() and (r.get("nome") or "").strip()]
+    recensioni_html = ""
+    if rec:
+        righe_rec = []
+        for r in rec:
+            viaggio = f", {e(r['viaggio'].strip())}" if (r.get("viaggio") or "").strip() else ""
+            righe_rec.append(f'        <li class="voce-gruppo"><blockquote>{e(r["testo"].strip())}</blockquote>'
+                             f'<p class="chi"><b>{e(r["nome"].strip())}</b>{viaggio}</p></li>')
+        recensioni_html = ('    <section class="sezione" aria-labelledby="t-gruppo">\n      <h2 id="t-gruppo">Dal gruppo</h2>\n'
+                           '      <ul class="gruppo">\n' + "\n".join(righe_rec) + '\n      </ul>\n    </section>')
+    dom = [d for d in profilo.get("domande") or [] if (d.get("domanda") or "").strip() and (d.get("risposta") or "").strip()]
+    domande_html = ""
+    if dom:
+        righe_dom = [f'        <details class="domanda"><summary>{e(d["domanda"].strip())}</summary><p>{e(d["risposta"].strip())}</p></details>'
+                     for d in dom]
+        domande_html = ('    <section class="sezione" aria-labelledby="t-domande">\n      <h2 id="t-domande">Com’è viaggiare con me</h2>\n'
+                        '      <div class="domande">\n' + "\n".join(righe_dom) + '\n      </div>\n    </section>')
 
     # contatti e azione principale
     ig = (profilo.get("instagram") or "").lstrip("@")
@@ -336,6 +384,7 @@ def main():
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,
+        "NUMERI": e(numeri), "RECENSIONI": recensioni_html, "DOMANDE": domande_html,
         "CREDITI": f'<p class="piede-crediti">{"<br>".join(crediti)}</p>' if crediti else "",
     }
     m = RADICE / "modello"
