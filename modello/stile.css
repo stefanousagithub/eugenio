@@ -152,6 +152,17 @@ img{display:block}
 .stato-attesa{color:var(--testo)}
 .imb-posti{flex-wrap:wrap}
 
+/* mappa leggera: un SVG statico, paesi visitati nell'accento */
+.mappa-box{margin-top:12px;padding:14px 12px 12px;border-radius:18px;background:var(--scheda)}
+.mappa{display:block;width:100%;height:auto}
+.mappa .terra{fill:var(--scheda-2)}
+.mappa .visto{fill:var(--accento-testo)}
+.mappa .prossimo{fill:color-mix(in srgb,var(--accento-testo) 18%,transparent);stroke:var(--accento-testo);stroke-width:1.6;stroke-dasharray:3 2.5;stroke-linejoin:round}
+.mappa-legenda{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;padding:0 4px;font-size:14px;color:var(--testo-2);font-variant-numeric:tabular-nums}
+.mappa-legenda span{display:inline-flex;align-items:center;gap:7px}
+.pallino{width:10px;height:10px;border-radius:50%;background:var(--accento-testo)}
+.pallino.vuoto{background:transparent;box-shadow:inset 0 0 0 1.6px var(--accento-testo)}
+
 /* numeri sotto la bio */
 .bio-numeri{margin-top:10px;font:600 15px/1.3 var(--font);color:var(--accento-testo);font-variant-numeric:tabular-nums}
 

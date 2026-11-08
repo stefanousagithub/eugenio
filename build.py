@@ -25,6 +25,7 @@ import urllib.request
 RADICE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RADICE / "strumenti"))
 from prepara_foto import colore_viaggio, pulita, salva  # noqa: E402
+from mappa import mappa_svg  # noqa: E402
 
 DIST = RADICE / "dist"
 MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
@@ -340,6 +341,20 @@ def main():
     if n_guida:
         numeri += f", {n_guida} da tour leader"
 
+    # mappa leggera: paesi visitati pieni, prossima meta tratteggiata
+    nomi_visti = sorted({(v.get("paese") or "").strip() for v in viaggi if (v.get("paese") or "").strip()})
+    nomi_futuri = [p.get("paese") or p.get("destinazione") or "" for p in future]
+    mappa_html = ""
+    if len(nomi_visti) >= 3:
+        svg, sconosciuti = mappa_svg(nomi_visti, nomi_futuri, f"Mappa dei paesi visitati: {', '.join(nomi_visti)}")
+        for n in sconosciuti:
+            if n in nomi_visti:
+                avvisi.append(f"Mappa: non riconosco il paese «{n}», scrivilo in italiano per intero (es. Repubblica Ceca)")
+        prossima = next((n for n in nomi_futuri if n and n not in nomi_visti and n not in sconosciuti), "")
+        legenda = (f'<span><i class="pallino"></i>{len(nomi_visti)} paesi</span>'
+                   + (f'<span><i class="pallino vuoto"></i>Prossima meta: {e(prossima)}</span>' if prossima else ""))
+        mappa_html = f'<figure class="mappa-box">{svg}<figcaption class="mappa-legenda">{legenda}</figcaption></figure>'
+
     # «Dal gruppo» (frasi vere di partecipanti) e domande: le sezioni compaiono solo se ci sono contenuti
     rec = [r for r in profilo.get("recensioni") or [] if (r.get("testo") or "").strip() and (r.get("nome") or "").strip()]
     recensioni_html = ""
@@ -400,6 +415,7 @@ def main():
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,
+        "MAPPA": mappa_html,
         "NUMERI": e(numeri), "RECENSIONI": recensioni_html, "DOMANDE": domande_html,
         "CREDITI": f'<p class="piede-crediti">{"<br>".join(crediti)}</p>' if crediti else "",
     }
