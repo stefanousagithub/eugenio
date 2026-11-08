@@ -88,26 +88,35 @@ content:
     list: true
     fields:
       - { name: titolo, label: Titolo, type: string, required: true }
-      - { name: anno, label: Anno, type: number, required: true, options: { min: 1990, max: 2100 } }
+      - name: tipo
+        label: Tipo di viaggio
+        type: select
+        default: gruppo
+        description: "Di gruppo: sta sulla linea del tempo e nella griglia. Per conto mio: nella fila «Per conto mio» e sulla mappa."
+        options:
+          values:
+            - { value: gruppo, label: Di gruppo (Avventure nel Mondo) }
+            - { value: personale, label: Per conto mio }
+      - { name: anno, label: Anno, type: number, options: { min: 1990, max: 2100 }, description: "Obbligatorio per i viaggi di gruppo. Per quelli tuoi puoi lasciarlo vuoto." }
       - name: mese
         label: Mese
         type: select
         options:
           values:
-            - { name: 1, label: Gennaio }
-            - { name: 2, label: Febbraio }
-            - { name: 3, label: Marzo }
-            - { name: 4, label: Aprile }
-            - { name: 5, label: Maggio }
-            - { name: 6, label: Giugno }
-            - { name: 7, label: Luglio }
-            - { name: 8, label: Agosto }
-            - { name: 9, label: Settembre }
-            - { name: 10, label: Ottobre }
-            - { name: 11, label: Novembre }
-            - { name: 12, label: Dicembre }
+            - { value: 1, label: Gennaio }
+            - { value: 2, label: Febbraio }
+            - { value: 3, label: Marzo }
+            - { value: 4, label: Aprile }
+            - { value: 5, label: Maggio }
+            - { value: 6, label: Giugno }
+            - { value: 7, label: Luglio }
+            - { value: 8, label: Agosto }
+            - { value: 9, label: Settembre }
+            - { value: 10, label: Ottobre }
+            - { value: 11, label: Novembre }
+            - { value: 12, label: Dicembre }
       - { name: tour_leader, label: Ero il tour leader, type: boolean, default: false }
-      - { name: paese, label: Paese, type: string, description: "Serve per contare i paesi visitati (es. Spagna anche per Tenerife)." }
+      - { name: paese, label: Paese, type: string, description: "In italiano, per la mappa e per contare i paesi (es. Spagna anche per Tenerife). Più paesi separati da virgola (es. Montenegro, Croazia)." }
       - { name: foto, label: Foto, type: image, description: "Una foto in cui ci sei tu. Viene ridimensionata e ripulita dai dati GPS in automatico." }
       - { name: inquadratura, label: Inquadratura della foto, type: number, default: 50, options: { min: 0, max: 100 }, description: "0 = lato sinistro, 50 = centro, 100 = lato destro." }
       - { name: colore, label: Colore (facoltativo), type: string, description: "Se lo lasci vuoto viene preso dalla foto." }

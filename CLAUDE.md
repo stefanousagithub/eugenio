@@ -70,7 +70,7 @@ Questo file riassume il lavoro fatto in chat e dice cosa fare adesso, in che ord
 
 ```bash
 python3 -m pip install -r requirements.txt
-python3 build.py --offline          # deve stampare "Sito generato in dist/: 9 viaggi, 1 partenze future."
+python3 build.py --offline          # deve stampare "Sito generato in dist/: N viaggi di gruppo, N miei, N partenze future."
 python3 -m http.server -d dist 8000 # controlla http://localhost:8000
 ```
 

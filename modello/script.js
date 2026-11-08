@@ -44,6 +44,44 @@ document.querySelectorAll(".imbarco").forEach(li => {
 const sezPartenze = $("#partenze");
 if (sezPartenze && !document.querySelector(".imbarco")) sezPartenze.hidden = true;
 
+/* ---------------- video: il lettore di Instagram si carica solo quando lo si apre, e si scarica alla chiusura ---------------- */
+const schermo = $("#schermo"), contVideo = $("#schermo-video");
+let tornaA = null;
+function apriVideo(url, titolo, colore, da) {
+  schermo.style.setProperty("--cv", colore || "#1c1c1e");
+  $("#schermo-titolo").textContent = titolo;
+  $("#schermo-link").href = url;
+  const fr = document.createElement("iframe");
+  fr.src = url + "embed/"; fr.title = `Video: ${titolo}`;
+  fr.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; fr.loading = "eager";
+  contVideo.replaceChildren(fr); tornaA = da || null;
+  schermo.showModal();
+}
+$("#schermo-chiudi").addEventListener("click", () => schermo.close());
+schermo.addEventListener("click", e => { if (e.target === schermo) schermo.close(); });
+schermo.addEventListener("close", () => { contVideo.replaceChildren(); if (tornaA) tornaA.focus(); });
+document.querySelectorAll(".scheda-mia[data-video]").forEach(b => b.addEventListener("click", () => apriVideo(b.dataset.video, b.dataset.titolo, b.dataset.c, b)));
+
+/* ---------------- mappa a tutto schermo: il mondo intero, da scorrere col dito, con gli elenchi dei paesi ---------------- */
+const mappaSchermo = $("#mappa-schermo");
+if (mappaSchermo) {
+  const apri = $("#mappa-apri"), grande = $("#mappa-grande");
+  apri.addEventListener("click", () => {
+    if (!grande.firstChild) {
+      const svg = apri.querySelector("svg.mappa").cloneNode(true);
+      const [cx, , cw] = svg.getAttribute("viewBox").split(" ").map(Number);
+      svg.setAttribute("viewBox", svg.dataset.intero); svg.removeAttribute("aria-label"); svg.setAttribute("aria-hidden", "true");
+      grande.append(svg); grande.dataset.centro = (cx + cw / 2) / 1000;
+    }
+    mappaSchermo.showModal();
+    // parte centrata sull'area visitata
+    grande.scrollLeft = grande.scrollWidth * +grande.dataset.centro - grande.clientWidth / 2;
+  });
+  $("#mappa-chiudi").addEventListener("click", () => mappaSchermo.close());
+  mappaSchermo.addEventListener("click", e => { if (e.target === mappaSchermo) mappaSchermo.close(); });
+  mappaSchermo.addEventListener("close", () => apri.focus());
+}
+
 /* ---------------- linea del tempo ---------------- */
 const tessere = [...document.querySelectorAll("#griglia > li")];
 const fatti = tessere.map(li => ({
@@ -238,23 +276,10 @@ if (fatti.length >= 2) {
   };
   palco.addEventListener("pointerup", lascia); palco.addEventListener("pointercancel", lascia);
 
-  // video: il lettore di Instagram si carica solo quando lo si apre, e si scarica alla chiusura
-  const schermo = $("#schermo"), contVideo = $("#schermo-video");
-  $("#p-video").addEventListener("click", () => {
+  $("#p-video").addEventListener("click", ev => {
     const v = voci[corrente]; if (!v.video) return;
-    fermaLapse();
-    schermo.style.setProperty("--cv", v.c || coloreOggi);
-    $("#schermo-titolo").textContent = `${v.titolo}, ${v.anno}`;
-    $("#schermo-link").href = v.video;
-    const fr = document.createElement("iframe");
-    fr.src = v.video + "embed/"; fr.title = `Video di ${v.titolo}`;
-    fr.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; fr.loading = "eager";
-    contVideo.replaceChildren(fr);
-    schermo.showModal();
+    fermaLapse(); apriVideo(v.video, `${v.titolo}, ${v.anno}`, v.c || coloreOggi, ev.currentTarget);
   });
-  $("#schermo-chiudi").addEventListener("click", () => schermo.close());
-  schermo.addEventListener("click", e => { if (e.target === schermo) schermo.close(); });
-  schermo.addEventListener("close", () => { contVideo.replaceChildren(); $("#p-video").focus(); });
 
   // le tessere della griglia aprono quel viaggio sulla linea del tempo, con un link condivisibile (#nome-viaggio)
   const indicePerSlug = s => voci.findIndex(v => v.slug === s);

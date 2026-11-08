@@ -183,7 +183,8 @@ def main():
         if al < oggi:
             viaggi.append({"titolo": p.get("titolo") or p.get("destinazione"), "anno": dal.year, "mese": dal.month,
                            "tour_leader": bool(p.get("tour_leader")), "foto": p.get("foto", ""), "inquadratura": 50,
-                           "colore": p["colore"], "frase": "", "scheda": p.get("scheda", ""),
+                           "colore": p["colore"], "frase": "", "scheda": p.get("scheda", ""), "tipo": "gruppo",
+                           "paese": p.get("paese") or p.get("destinazione") or "", "video": "",
                            "riga": f"Con Avventure nel Mondo{', cod. ' + p['codice'] if p.get('codice') else ''}, "
                                    f"dal {dal.day} {MESI[dal.month - 1]} al {al.day} {MESI[al.month - 1]}."})
             continue
@@ -204,20 +205,28 @@ def main():
     # viaggi fatti, dal più vecchio (il CMS può salvare numeri come testo: li normalizzo)
     for i, v in enumerate(viaggi, 1):
         dove = f"Viaggio {i} ({v.get('titolo') or 'senza titolo'})"
+        v["tipo"] = "personale" if v.get("tipo") == "personale" else "gruppo"
         try:
             v["anno"] = int(v.get("anno"))
+        except (TypeError, ValueError):
+            v["anno"] = None if v["tipo"] == "personale" and not str(v.get("anno") or "").strip() else v.get("anno")
+        try:
             v["mese"] = min(12, max(1, int(v.get("mese") or 1)))
         except (TypeError, ValueError):
-            pass
+            v["mese"] = 1
         if not (v.get("titolo") or "").strip():
             errori.append(f"{dove}: manca il titolo")
-        if not isinstance(v.get("anno"), int) or not 1950 <= v["anno"] <= oggi.year + 1:
+        if v["anno"] is None:
+            pass  # viaggio mio senza anno: va bene, non sta sulla linea del tempo
+        elif not isinstance(v.get("anno"), int) or not 1950 <= v["anno"] <= oggi.year + 1:
             errori.append(f"{dove}: l'anno «{v.get('anno')}» non è valido")
         if v.get("colore") and not colore_valido(v["colore"]):
             errori.append(f"{dove}: il colore «{v['colore']}» non è valido (formato #RRGGBB)")
     if errori:
         sys.exit("La build si è fermata. Da correggere:\n- " + "\n- ".join(errori))
-    viaggi.sort(key=lambda v: (v["anno"], v.get("mese") or 1))
+    viaggi.sort(key=lambda v: (v["anno"] or 9999, v.get("mese") or 1))
+    gruppo = [v for v in viaggi if v["tipo"] == "gruppo"]  # linea del tempo e griglia
+    personali = [v for v in viaggi if v["tipo"] == "personale"]  # sezione «Per conto mio»
 
     # slug unici (servono ai link condivisibili #nome-viaggio)
     usati = set()
@@ -230,7 +239,7 @@ def main():
     # foto
     oggi_foto = foto(profilo.get("foto_oggi"), "oggi", "Profilo")
     tessere = []
-    for v in viaggi:
+    for v in gruppo:
         info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
         colore = v.get("colore") or (info and info["colore"]) or "#2c2c2e"
         guida = "si" if v.get("tour_leader") else "no"
@@ -246,6 +255,37 @@ def main():
         badge = '<span class="badge">Tour leader</span>' if v.get("tour_leader") else ""
         tessere.append(f'        <li {attr}><a class="tessera" href="#{v["_slug"]}" style="--c:{colore}">{badge}{immagine}'
                        f'<span class="didascalia"><b>{e(v["titolo"])}</b><span class="anno">{v["anno"]}</span></span></a></li>')
+
+    # «Per conto mio»: viaggi fuori dai gruppi. Con un video la scheda lo apre; senza foto né video finiscono in «E poi»
+    ICONA_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>'
+    schede_mie, altri_miei = [], []
+    for v in personali:
+        info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
+        video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
+        if not info and not video:
+            altri_miei.append(v["titolo"])
+            continue
+        colore = v.get("colore") or (info and info["colore"]) or "#2c2c2e"
+        immagine = ""
+        if info:
+            immagine = (f'<picture><source srcset="foto/mini/{info["nome"]}.webp" type="image/webp"><img src="foto/mini/{info["nome"]}.jpg" '
+                        f'width="{info["mw"]}" height="{info["mh"]}" alt="" loading="lazy" decoding="async" '
+                        f'style="object-position:{int(v.get("inquadratura") or 50)}% 50%"></picture>')
+        anno = f'<span class="anno">{v["anno"]}</span>' if v["anno"] else ""
+        didascalia = f'<span class="didascalia"><b>{e(v["titolo"])}</b>{anno}</span>'
+        if video:
+            titolo_video = f'{v["titolo"]}{", " + str(v["anno"]) if v["anno"] else ""}'
+            schede_mie.append(f'        <li><button class="scheda-mia" type="button" data-video="{e(video)}" data-titolo="{e(titolo_video)}" data-c="{colore}" '
+                              f'style="--c:{colore}" aria-label="Guarda il video: {e(titolo_video)}">{immagine}'
+                              f'<span class="play">{ICONA_PLAY}</span>{didascalia}</button></li>')
+        else:
+            schede_mie.append(f'        <li><div class="scheda-mia" style="--c:{colore}">{immagine}{didascalia}</div></li>')
+    miei_html = ""
+    if schede_mie or altri_miei:
+        altri = f'      <p class="miei-altri">E poi: {e(", ".join(altri_miei))}.</p>\n' if altri_miei else ""
+        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <h2 id="t-miei">Per conto mio</h2>\n'
+                     '      <p class="sezione-sotto">Fuori dai viaggi di gruppo. Dove c\'è il simbolo ▶ c\'è il video che ho montato.</p>\n'
+                     '      <ul class="miei">\n' + "\n".join(schede_mie) + '\n      </ul>\n' + altri + '    </section>')
 
     # crediti delle foto non di Eugenio
     crediti = []
@@ -332,28 +372,57 @@ def main():
                          f'      <h2 id="t-partenze">{titolo_sez}</h2>\n      <ul class="imbarchi">\n'
                          + "\n".join(blocchi) + "\n      </ul>\n    </section>")
 
+    # paesi: il campo «Paese» può averne più d'uno separati da virgola (es. Balcani). L'Italia è casa, non la conto
+    def paesi_di(v):
+        return [n.strip() for n in (v.get("paese") or "").split(",") if n.strip() and n.strip().lower() != "italia"]
+
+    def elenco(lista):
+        visti_l, out = set(), []
+        for n in lista:
+            if n.lower() not in visti_l:
+                visti_l.add(n.lower()); out.append(n)
+        return out
+
+    paesi_gruppo = elenco(n for v in gruppo for n in paesi_di(v))
+    paesi_miei = elenco(n for v in personali for n in paesi_di(v) if n.lower() not in {x.lower() for x in paesi_gruppo})
+    paesi_tutti = paesi_gruppo + paesi_miei
+    paesi_prossimi = elenco(n for p in future for n in [p.get("paese") or p.get("destinazione") or ""]
+                            if n and n.lower() not in {x.lower() for x in paesi_tutti})
+
     # numeri: si calcolano dai dati, quindi sono sempre veri
-    paesi = {(v.get("paese") or "").strip().lower() for v in viaggi}
-    n_guida = sum(1 for v in viaggi if v.get("tour_leader"))
-    numeri = f"{len(viaggi)} viaggi"
-    if "" not in paesi and len(paesi) > 1:
-        numeri += f" in {len(paesi)} paesi"
+    n_guida = sum(1 for v in gruppo if v.get("tour_leader"))
+    numeri = f"{len(gruppo)} viaggi di gruppo"
     if n_guida:
         numeri += f", {n_guida} da tour leader"
+    if len(paesi_tutti) > 1:
+        numeri += f" · {len(paesi_tutti)} paesi visitati"
 
-    # mappa leggera: paesi visitati pieni, prossima meta tratteggiata
-    nomi_visti = sorted({(v.get("paese") or "").strip() for v in viaggi if (v.get("paese") or "").strip()})
-    nomi_futuri = [p.get("paese") or p.get("destinazione") or "" for p in future]
-    mappa_html = ""
-    if len(nomi_visti) >= 3:
-        svg, sconosciuti = mappa_svg(nomi_visti, nomi_futuri, f"Mappa dei paesi visitati: {', '.join(nomi_visti)}")
+    # mappa: in accento i paesi dei viaggi di gruppo, in tono neutro i miei, tratteggiata la prossima meta.
+    # Nella pagina è ritagliata sull'area visitata; «Espandi» la apre a tutto schermo con il mondo intero e gli elenchi
+    mappa_html = mappa_schermo = ""
+    if len(paesi_tutti) >= 3:
+        categorie = {**{n: "prossimo" for n in paesi_prossimi}, **{n: "mio" for n in paesi_miei}, **{n: "gruppo" for n in paesi_gruppo}}
+        svg, sconosciuti = mappa_svg(categorie, f"Mappa dei paesi visitati: {', '.join(paesi_tutti)}")
         for n in sconosciuti:
-            if n in nomi_visti:
+            if n not in paesi_prossimi:
                 avvisi.append(f"Mappa: non riconosco il paese «{n}», scrivilo in italiano per intero (es. Repubblica Ceca)")
-        prossima = next((n for n in nomi_futuri if n and n not in nomi_visti and n not in sconosciuti), "")
-        legenda = (f'<span><i class="pallino"></i>{len(nomi_visti)} paesi</span>'
-                   + (f'<span><i class="pallino vuoto"></i>Prossima meta: {e(prossima)}</span>' if prossima else ""))
-        mappa_html = f'<figure class="mappa-box">{svg}<figcaption class="mappa-legenda">{legenda}</figcaption></figure>'
+        prossima = next((n for n in paesi_prossimi if n not in sconosciuti), "")
+        legenda = (f'<span><i class="pallino gruppo"></i>In gruppo</span><span><i class="pallino mio"></i>Per conto mio</span>'
+                   + (f'<span><i class="pallino prossimo"></i>Prossima meta</span>' if prossima else ""))
+        mappa_html = (f'    <section class="sezione" aria-labelledby="t-mappa">\n      <h2 id="t-mappa">Dove sono stato</h2>\n'
+                      f'      <figure class="mappa-box"><button class="mappa-apri" id="mappa-apri" type="button" aria-label="Apri la mappa a tutto schermo">'
+                      f'{svg}<span class="mappa-espandi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" '
+                      f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Espandi</span></button>'
+                      f'<figcaption class="mappa-legenda">{legenda}</figcaption></figure>\n    </section>')
+        righe = [("gruppo", "In gruppo", paesi_gruppo), ("mio", "Per conto mio", paesi_miei),
+                 ("prossimo", "Prossima meta", [prossima] if prossima else [])]
+        liste = "".join(f'<div class="mappa-elenco"><p><i class="pallino {c}"></i>{t} <span>{len(l)}</span></p><p>{e(", ".join(l))}</p></div>'
+                        for c, t, l in righe if l)
+        mappa_schermo = (f'<dialog class="schermo schermo-mappa" id="mappa-schermo" aria-labelledby="mappa-titolo">'
+                         f'<div class="schermo-testa"><p class="schermo-titolo" id="mappa-titolo">{len(paesi_tutti)} paesi visitati</p>'
+                         f'<button class="schermo-chiudi" id="mappa-chiudi" type="button" aria-label="Chiudi la mappa"><svg viewBox="0 0 24 24" fill="none" '
+                         f'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>'
+                         f'<div class="mappa-grande" id="mappa-grande"></div><div class="mappa-liste">{liste}</div></dialog>')
 
     # «Dal gruppo» (frasi vere di partecipanti) e domande: le sezioni compaiono solo se ci sono contenuti
     rec = [r for r in profilo.get("recensioni") or [] if (r.get("testo") or "").strip() and (r.get("nome") or "").strip()]
@@ -415,7 +484,7 @@ def main():
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,
-        "MAPPA": mappa_html,
+        "MAPPA": mappa_html, "MIEI": miei_html, "MAPPA_SCHERMO": mappa_schermo,
         "NUMERI": e(numeri), "RECENSIONI": recensioni_html, "DOMANDE": domande_html,
         "CREDITI": f'<p class="piede-crediti">{"<br>".join(crediti)}</p>' if crediti else "",
     }
@@ -437,7 +506,7 @@ def main():
 
     for x in avvisi:
         print(f"::warning::{x}")
-    print(f"Sito generato in dist/: {len(viaggi)} viaggi, {len(future)} partenze future.")
+    print(f"Sito generato in dist/: {len(gruppo)} viaggi di gruppo, {len(personali)} miei, {len(future)} partenze future.")
 
 
 def numero_wa(n):
