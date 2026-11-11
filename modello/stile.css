@@ -74,11 +74,31 @@ img{display:block}
 .pannello-riga{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .pannello-viaggio{font:700 28px/1.1 var(--font-titoli);letter-spacing:-.025em;text-wrap:balance}
 .pannello-anno{flex:none;font:300 28px/1.1 var(--font-titoli);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.pannello-riga2{margin-top:4px;font-size:15px;color:rgba(255,255,255,.86);text-wrap:pretty}
+.pannello-riga2{margin-top:4px;font-size:15px;color:rgba(255,255,255,.86);text-wrap:pretty;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pannello-frase{margin-top:12px;font:italic 400 19px/1.35 var(--font-motto);letter-spacing:0;text-wrap:pretty}
-.pannello-extra{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.pannello-extra{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin-top:12px;min-height:36px;overflow:hidden}
+.leggi{flex:none;display:inline-flex;align-items:center;height:36px;padding:0 12px;border:0;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font:600 15px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out),background-color .16s ease}
+.leggi:active{transform:scale(.97)}
+.pannello-extra>*{flex:none}
+
+/* scheda del viaggio: si apre da «Leggi tutto», foto in alto e testo completo */
+.dettaglio{width:min(520px,calc(100% - 32px));max-height:calc(100% - 48px);margin:auto;padding:0;border:0;border-radius:24px;overflow:auto;background:var(--scheda);color:var(--testo);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.dettaglio[open]{animation:entra .32s var(--ease-out)}
+.dettaglio::backdrop{background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dettaglio-foto{position:relative;aspect-ratio:16/10;background:var(--c,var(--scheda-2))}
+.dettaglio-foto>img:first-child{width:100%;height:100%;object-fit:cover}
+.dettaglio-timbro{position:absolute;left:14px;bottom:-30px;width:78px;height:78px;transform:rotate(-9deg);filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.dettaglio-chiudi{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.45);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.dettaglio-testi{padding:20px 20px 22px}
+.dettaglio-foto:has(.dettaglio-timbro:not([hidden]))+.dettaglio-testi{padding-top:40px}
+.dettaglio-titolo{font:800 26px/1.1 var(--font-titoli);letter-spacing:-.025em;text-wrap:balance}
+.dettaglio-quando{margin-top:6px;font:600 14px/1.3 var(--font);color:var(--testo-2);font-variant-numeric:tabular-nums}
+.dettaglio-descr{margin-top:12px;font-size:17px;line-height:1.5;text-wrap:pretty}
+.dettaglio-azioni{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.dettaglio-azioni .guarda{background:var(--accento)}
+.dettaglio-azioni:not(:has(> :not([hidden]))){display:none}
 .pannello-extra:not(:has(> :not([hidden]))){display:none}
-.guarda{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px 0 12px;border:0;border-radius:999px;background:rgba(255,255,255,.94);color:#000;font:600 15px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out)}
+.guarda{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px 0 11px;border:0;border-radius:999px;background:rgba(255,255,255,.94);color:#000;font:600 15px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out)}
 .guarda svg{width:16px;height:16px}
 .guarda:active{transform:scale(.97)}
 .ruolo-pillola{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--accento);color:#000;font:700 12px/1 var(--font);letter-spacing:0}

@@ -176,9 +176,16 @@ if (fatti.length >= 2) {
     if (v.futuro) $("#p-partenza").href = `#imb-${v.slug}`;
     const q = $("#p-quando"); q.hidden = !v.quando; q.textContent = v.quando || "";
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
+    // la descrizione sta su due righe: se è più lunga, «Leggi tutto» apre la scheda del viaggio
+    const r = $("#p-riga"); $("#p-leggi").hidden = !!v.oggi || r.scrollHeight <= r.clientHeight + 1;
   }
   let corrente = iOggi;
-  function misura() { scrivi(voci[corrente]); }
+  // il pannello ha sempre la stessa altezza (quella del viaggio che ne occupa di più): niente salti durante il time-lapse
+  function misura() {
+    testi.style.minHeight = "";
+    let h = 0; voci.forEach(v => { scrivi(v); h = Math.max(h, testi.offsetHeight); });
+    testi.style.minHeight = h + "px"; scrivi(voci[corrente]);
+  }
   // il pannello prende l'altezza del testo di ogni viaggio, con una transizione breve invece di un salto
   let animTesti = null;
   function scriviMorbido(v) {
@@ -308,6 +315,29 @@ if (fatti.length >= 2) {
     }
   };
   palco.addEventListener("pointerup", lascia); palco.addEventListener("pointercancel", lascia);
+
+  // scheda del viaggio
+  const dettaglio = $("#dettaglio");
+  $("#p-leggi").addEventListener("click", ev => {
+    const v = voci[corrente]; fermaLapse();
+    const box = $("#dettaglio-foto"); box.style.setProperty("--c", v.c || coloreOggi);
+    const im = $("#dettaglio-img"); im.hidden = !v.foto; if (v.foto) { im.src = src(v); im.style.objectPosition = `${v.pos}% 50%`; }
+    const tb = $("#dettaglio-timbro"); tb.hidden = !v.timbro; if (v.timbro) tb.src = `timbri/${v.timbro}.webp`;
+    $("#dettaglio-titolo").textContent = v.titolo;
+    $("#dettaglio-quando").textContent = v.quando || String(v.anno);
+    $("#dettaglio-descr").textContent = v.riga || "";
+    $("#dettaglio-video").hidden = !v.video;
+    const carta = $("#dettaglio-carta"); carta.hidden = !v.futuro; if (v.futuro) carta.href = `#imb-${v.slug}`;
+    dettaglio.dataset.da = "p-leggi"; dettaglio.showModal();
+  });
+  $("#dettaglio-chiudi").addEventListener("click", () => dettaglio.close());
+  dettaglio.addEventListener("click", e => { if (e.target === dettaglio) dettaglio.close(); });
+  $("#dettaglio-carta").addEventListener("click", () => dettaglio.close());
+  dettaglio.addEventListener("close", () => $("#p-leggi").focus());
+  $("#dettaglio-video").addEventListener("click", () => {
+    const v = voci[corrente]; dettaglio.close();
+    apriVideo(v.video, `${v.titolo}, ${v.anno}`, v.c || coloreOggi, $("#p-video"));
+  });
 
   $("#p-video").addEventListener("click", ev => {
     const v = voci[corrente]; if (!v.video) return;

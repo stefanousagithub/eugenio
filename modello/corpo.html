@@ -34,7 +34,8 @@
         <div class="pannello-extra">
           <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
           <button class="guarda" id="p-video" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>Guarda il video</button>
-          <a class="guarda" id="p-partenza" href="#partenze" hidden>Vedi la carta d'imbarco</a>
+          <a class="guarda" id="p-partenza" href="#partenze" hidden>Carta d'imbarco</a>
+          <button class="leggi" id="p-leggi" type="button" hidden>Leggi tutto</button>
         </div>
         <p class="pannello-frase" id="p-frase" hidden translate="no"></p>
       </div>
@@ -92,4 +93,14 @@
   <a class="schermo-link" id="schermo-link" href="#" target="_blank" rel="noopener">Apri su Instagram</a>
 </dialog>
 {{MAPPA_SCHERMO}}
+<dialog class="dettaglio" id="dettaglio" aria-labelledby="dettaglio-titolo">
+  <div class="dettaglio-foto" id="dettaglio-foto"><img id="dettaglio-img" alt="" decoding="async"><img class="dettaglio-timbro" id="dettaglio-timbro" alt="Tour leader" hidden>
+    <button class="schermo-chiudi dettaglio-chiudi" id="dettaglio-chiudi" type="button" aria-label="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="dettaglio-testi">
+    <h3 class="dettaglio-titolo" id="dettaglio-titolo"></h3>
+    <p class="dettaglio-quando" id="dettaglio-quando"></p>
+    <p class="dettaglio-descr" id="dettaglio-descr"></p>
+    <div class="dettaglio-azioni"><button class="guarda" id="dettaglio-video" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>Guarda il video</button><a class="guarda" id="dettaglio-carta" href="#partenze" hidden>Carta d'imbarco</a></div>
+  </div>
+</dialog>
 <script>
