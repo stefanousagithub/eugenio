@@ -155,38 +155,44 @@ img{display:block}
 /* sottotitolo di sezione */
 .sezione-sotto{margin-top:4px;padding:0 4px;font-size:15px;color:var(--testo-2);text-wrap:pretty}
 
-/* «In autonomia»: cartoline in fila. Leggermente storte come appoggiate sul tavolo;
-   col mouse sopra quella puntata si raddrizza e si avvicina, le altre restano dove sono */
-.titolo-frecce{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.frecce{display:flex;gap:8px;padding-right:2px}
-.freccia{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:var(--tinta);color:var(--testo);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out),opacity .2s ease}
-.freccia svg{width:18px;height:18px}
-.freccia:active{transform:scale(.92)}
-.freccia:disabled{opacity:.3;cursor:default}
-.miei{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:44%;gap:12px;margin:4px -16px 0;padding:18px 16px 22px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.miei::-webkit-scrollbar{display:none}
-.miei li{scroll-snap-align:start}
+/* «In autonomia»: un mazzo di cartoline aperto a ventaglio. Lo script dispone le carte (posizione, rotazione);
+   qui c'è solo l'aspetto e la transizione, lenta e morbida come una carta che si sfila dal mazzo */
+.miei{position:relative;list-style:none;margin-top:18px;min-height:240px}
+.miei li{position:absolute;left:0;top:18px;transform-origin:50% 100%;transition:transform .5s cubic-bezier(.2,.9,.25,1)}
 .scheda-mia{position:relative;display:block;width:100%;padding:7px 7px 0;border:0;border-radius:6px;background:#f6f4ef;color:#1c1c1e;text-align:left;font:inherit;cursor:pointer;
-  box-shadow:0 1px 2px rgba(0,0,0,.18),0 8px 20px rgba(0,0,0,.22);transform:rotate(-1.6deg);-webkit-tap-highlight-color:transparent;
-  transition:transform .45s cubic-bezier(.2,.9,.25,1),box-shadow .45s cubic-bezier(.2,.9,.25,1)}
-.miei li:nth-child(even) .scheda-mia{transform:rotate(1.4deg)}
-.miei li:nth-child(3n) .scheda-mia{transform:rotate(-.6deg)}
+  box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 24px rgba(0,0,0,.26);-webkit-tap-highlight-color:transparent;transition:box-shadow .5s cubic-bezier(.2,.9,.25,1)}
 div.scheda-mia{cursor:default}
+.miei li[style*="z-index: 50"] .scheda-mia{box-shadow:0 2px 4px rgba(0,0,0,.2),0 22px 40px rgba(0,0,0,.36)}
 .cartolina-foto{position:relative;display:block;aspect-ratio:4/5;border-radius:3px;overflow:hidden;background:var(--c,var(--scheda-2))}
 .cartolina-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .retro{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:9px 3px 10px}
 .retro b{font:700 14px/1.2 var(--font-titoli);letter-spacing:-.01em;text-wrap:balance}
 .retro .anno{flex:none;font-size:13px;color:rgba(60,60,67,.7);font-variant-numeric:tabular-nums}
-.scheda-mia:active{transform:rotate(0) scale(.97)!important}
 .play{position:absolute;z-index:1;top:8px;right:8px;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);color:#000;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .play svg{width:14px;height:14px;margin-left:2px}
 .miei-altri{margin-top:10px;padding:0 4px;font-size:15px;color:var(--testo-2)}
-@media (hover:hover) and (pointer:fine){
-  .miei li{position:relative}
-  .miei li:hover{z-index:2}
-  .miei li:hover .scheda-mia{transform:rotate(0) scale(1.07) translateY(-6px)!important;box-shadow:0 2px 4px rgba(0,0,0,.18),0 18px 36px rgba(0,0,0,.32)}
-}
-@media (min-width:560px){.miei{grid-auto-columns:31%;margin:4px -12px 0;padding:22px 12px 26px;scroll-padding:0 12px}}
+
+/* striscia di miniature al posto della linea con le tacche */
+.striscia{position:relative;display:flex;align-items:flex-end;gap:5px;padding:10px 2px 2px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;outline-offset:4px}
+.striscia.trascina{cursor:grabbing}
+.fotogramma{flex:1 1 0;min-width:0;max-width:52px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fotogramma.oggi{margin-left:6px}
+.fotogramma.oggi+.fotogramma.partenza{margin-left:10px}
+.fotogramma-quadro{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:4/5;border-radius:7px;overflow:hidden;background:var(--c);color:rgba(255,255,255,.8);font:700 15px/1 var(--font-titoli);
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.28);opacity:.62;transform-origin:50% 100%;transition:transform .28s var(--ease-out),opacity .28s ease,box-shadow .28s ease}
+.fotogramma-quadro img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.fotogramma.oggi .fotogramma-quadro{border-radius:50%;aspect-ratio:1}
+.fotogramma.partenza .fotogramma-quadro{box-shadow:none;outline:1.5px dashed var(--accento);outline-offset:2px}
+.fotogramma.guida .fotogramma-quadro::after{content:"";position:absolute;left:50%;bottom:4px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--accento);box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+.fotogramma.scelto .fotogramma-quadro{opacity:1;transform:scale(1.22) translateY(-3px);box-shadow:0 0 0 2px #fff,0 6px 14px rgba(0,0,0,.35)}
+.fotogramma.partenza.scelto .fotogramma-quadro{box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.striscia.trascina .fotogramma-quadro,.striscia.lapse .fotogramma-quadro{transition-duration:.12s}
+.fotogramma-data{height:13px;font-size:11.5px;line-height:13px;color:rgba(255,255,255,.74);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fotogramma.partenza .fotogramma-data{color:var(--accento)}
+.fotogramma.scelto .fotogramma-data{color:#fff;font-weight:600}
+.fotogramma.partenza.invito .fotogramma-quadro{animation:invito-quadro 1.1s var(--ease-out) 2}
+@keyframes invito-quadro{50%{transform:translateY(-5px)}}
+@media (hover:hover) and (pointer:fine){.fotogramma:hover .fotogramma-quadro{opacity:.9}}
 
 /* pannello «Oggi»: prossime partenze e numeri, così lo spazio non resta vuoto */
 .pannello-oggi{margin-top:14px;display:grid;gap:12px}
@@ -341,5 +347,6 @@ html{scroll-padding-bottom:110px}
   .palco,.pannello,.cursore,.tessera,.azione,.pill,.scatto,.palco-titolo,.guarda{transition-duration:.01ms!important}
   .schermo[open]{animation:none}
   .cella.gira span,.tacca-futura.invito::after,.timbro.stampa{animation:none}
-  .scheda-mia,.freccia,.prossima{transition-duration:.01ms!important}
+  .scheda-mia,.miei li,.fotogramma-quadro{transition-duration:.01ms!important}
+  .fotogramma.partenza.invito .fotogramma-quadro{animation:none}
 }

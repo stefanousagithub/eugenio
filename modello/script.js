@@ -96,11 +96,11 @@ let rigaOggi = rigaBase;
 if (inCorso) {
   rigaOggi = `Adesso sono in viaggio: ${inCorso.titolo}, giorno ${giorni(inCorso.dal, oggi) + 1} di ${giorni(inCorso.dal, inCorso.al) + 1}.`;
 }
-// pannello «Oggi»: le prossime partenze con il conto dei giorni, calcolato a ogni visita dalla data di oggi
-const tra = n => n > 1 ? `tra ${n}${NBSP}giorni` : n === 1 ? "domani" : "in viaggio";
-$("#p-prossime").innerHTML = futuri.map(f =>
-  `<a class="prossima" href="#imb-${f.slug}"><span class="prossima-pallino" aria-hidden="true"></span><b>${f.titolo}</b>` +
-  `<span>${fmtBreve(f.data)} · ${tra(f.mancano)}</span></a>`).join("");
+else if (prossimo) {
+  // il conto dei giorni si calcola a ogni visita dalla data di oggi
+  const tra = prossimo.mancano > 1 ? `tra ${prossimo.mancano}${NBSP}giorni` : "domani";
+  rigaOggi = `${rigaBase} Prossima partenza: ${prossimo.titolo}, ${tra}.`;
+}
 $("#p-riga").textContent = rigaOggi;
 const voci = [...fatti,
   { titolo: "Oggi", anno: oggi.getFullYear(), oggi: true, riga: rigaOggi, c: null },
@@ -114,50 +114,28 @@ if (fatti.length >= 2) {
   const imgOggi = $("#scatto-a"), imgB = $("#scatto-b"), linea = $("#linea"), testi = $("#p-testi");
   const coloreOggi = getComputedStyle(document.documentElement).getPropertyValue("--oggi").trim();
 
-  // posizioni: passo fisso, più spazio per gli anni saltati e prima di "oggi"
-  let x = 0; const pos = [];
-  voci.forEach((v, i) => {
-    if (i) { x += 1 + Math.max(0, v.anno - voci[i - 1].anno - 1) * .6; if (v.oggi) x += .25; if (v.futuro) x += 1.1; }
-    pos.push(x);
-  });
-  voci.forEach((v, i) => v.x = 2 + pos[i] / (pos[pos.length - 1] || 1) * 96);
-
+  // striscia di miniature (come lo scrubber delle app di foto): un fotogramma per viaggio, «oggi» con la foto di Eugenio,
+  // le partenze tratteggiate con la data. Si tocca, si trascina col dito, si usa con le frecce della tastiera
   linea.hidden = false; $("#istruzione").hidden = false;
-  linea.innerHTML = '<span class="binario"></span>';
-  if (futuri.length) { const f = document.createElement("span"); f.className = "futuro"; f.style.left = voci[iOggi].x + "%"; f.style.right = "0"; linea.append(f); }
-  voci.forEach(v => {
-    if (v.oggi) return;
-    const t = document.createElement("span");
-    t.className = v.futuro ? "tacca-futura" : "tacca" + (v.guida ? " guida" : "");
-    t.style.left = v.x + "%"; linea.append(t);
+  linea.className = "striscia"; linea.tabIndex = 0;
+  linea.setAttribute("role", "listbox"); linea.setAttribute("aria-label", "I viaggi nel tempo");
+  let annoVisto = null;
+  const fotogrammi = voci.map((v, i) => {
+    const b = document.createElement("span");
+    b.className = "fotogramma" + (v.oggi ? " oggi" : "") + (v.futuro ? " partenza" : "") + (v.guida ? " guida" : "");
+    b.setAttribute("role", "option"); b.id = `fotogramma-${i}`; b.setAttribute("aria-label", `${v.titolo}, ${v.anno}`);
+    b.style.setProperty("--c", v.c || coloreOggi);
+    const mini = v.oggi ? "oggi" : v.foto;
+    const quadro = document.createElement("span"); quadro.className = "fotogramma-quadro";
+    if (mini) { const im = document.createElement("img"); im.src = `foto/micro/${mini}.webp`; im.alt = ""; im.decoding = "async"; quadro.append(im); }
+    else quadro.textContent = v.titolo.charAt(0);
+    b.append(quadro);
+    let et = "";
+    if (v.oggi) et = "oggi"; else if (v.futuro) et = fmtBreve(v.data); else if (v.anno !== annoVisto) { et = String(v.anno); annoVisto = v.anno; }
+    const s = document.createElement("span"); s.className = "fotogramma-data"; s.textContent = et; b.append(s);
+    linea.append(b); return b;
   });
-  // etichette: anni, "oggi", mesi delle partenze; poi tolgo gli anni che si sovrappongono
-  const etichette = []; let annoVisto = null;
-  voci.forEach((v, i) => {
-    let testo = null, cls = "etichetta";
-    if (v.oggi) testo = "oggi";
-    else if (v.futuro) { testo = fmtBreve(v.data); cls += " futura" + (i === voci.length - 1 ? " ultima" : ""); }
-    else if (v.anno !== annoVisto) { testo = String(v.anno); annoVisto = v.anno; }
-    if (!testo) return;
-    const e = document.createElement("span"); e.className = cls + (i === 0 ? " prima" : ""); e.textContent = testo;
-    e.style.left = (i === 0 ? v.x - 1 : v.x) + "%"; linea.append(e);
-    etichette.push({ e, fissa: v.oggi || v.futuro });
-  });
-  const cur = document.createElement("span");
-  cur.className = "cursore"; cur.tabIndex = 0; cur.setAttribute("role", "slider");
-  cur.setAttribute("aria-label", "Viaggio sulla linea del tempo");
-  cur.setAttribute("aria-valuemin", 0); cur.setAttribute("aria-valuemax", voci.length - 1);
-  linea.append(cur);
-  const sistemaEtichette = () => {
-    etichette.forEach(x => x.e.hidden = false);
-    const r = el => el.getBoundingClientRect();
-    const fisse = etichette.filter(x => x.fissa).map(x => r(x.e));
-    let prec = null;
-    etichette.filter(x => !x.fissa).forEach(({ e }) => {
-      const b = r(e), tocca = a => b.left < a.right + 6 && b.right > a.left - 6;
-      if ((prec && tocca(prec)) || fisse.some(tocca)) e.hidden = true; else prec = b;
-    });
-  };
+  const sistemaEtichette = () => {};
 
   // testi del pannello: l'area tiene l'altezza del viaggio più lungo, così la pagina sotto non salta
   function scrivi(v) {
@@ -168,16 +146,22 @@ if (fatti.length >= 2) {
     $("#p-video").hidden = !v.video;
     $("#p-partenza").hidden = !v.futuro;
     $("#p-oggi").hidden = !v.oggi;
+    $("#istruzione").hidden = false;
     if (v.futuro) $("#p-partenza").href = `#imb-${v.slug}`;
     const q = $("#p-quando"); q.hidden = !v.quando; q.textContent = v.quando || "";
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
   }
   let corrente = iOggi;
-  function misura() {
-    testi.style.minHeight = "";
-    let h = 0; voci.forEach(v => { scrivi(v); h = Math.max(h, testi.offsetHeight); });
-    testi.style.minHeight = h + "px"; scrivi(voci[corrente]);
-    sistemaEtichette();
+  function misura() { scrivi(voci[corrente]); }
+  // il pannello prende l'altezza del testo di ogni viaggio, con una transizione breve invece di un salto
+  let animTesti = null;
+  function scriviMorbido(v) {
+    const h0 = testi.offsetHeight; scrivi(v); const h1 = testi.offsetHeight;
+    if (ridotto || h0 === h1) return;
+    if (animTesti) animTesti.cancel();
+    testi.style.overflow = "hidden";
+    animTesti = testi.animate([{ height: h0 + "px" }, { height: h1 + "px" }], { duration: 260, easing: EASE });
+    animTesti.onfinish = animTesti.oncancel = () => { testi.style.overflow = ""; };
   }
 
   const src = v => `foto/${v.foto}.webp`;
@@ -187,9 +171,9 @@ if (fatti.length >= 2) {
     i = Math.max(0, Math.min(voci.length - 1, i));
     corrente = i; const v = voci[i];
     tempo.style.setProperty("--cv", v.c || coloreOggi);
-    cur.style.left = v.x + "%";
-    cur.setAttribute("aria-valuenow", i); cur.setAttribute("aria-valuetext", `${v.titolo} ${v.anno}`);
-    scrivi(v);
+    fotogrammi.forEach((b, k) => { b.classList.toggle("scelto", k === i); b.setAttribute("aria-selected", k === i ? "true" : "false"); });
+    linea.setAttribute("aria-activedescendant", `fotogramma-${i}`);
+    scriviMorbido(v);
     if (v.oggi) { imgOggi.classList.add("is-on"); imgB.classList.remove("is-on"); palco.classList.remove("senza-foto"); }
     else if (v.foto) {
       imgB.hidden = false; imgB.style.objectPosition = `${v.pos}% 50%`;
@@ -234,8 +218,8 @@ if (fatti.length >= 2) {
 
   // trascinare la linea: il cursore segue il dito 1:1
   const indiceDa = clientX => {
-    const r = linea.getBoundingClientRect(), p = (clientX - r.left) / r.width * 100;
-    let best = 0; voci.forEach((v, i) => { if (Math.abs(v.x - p) < Math.abs(voci[best].x - p)) best = i; });
+    let best = 0, dist = Infinity;
+    fotogrammi.forEach((b, i) => { const r = b.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - clientX); if (d < dist) { dist = d; best = i; } });
     return best;
   };
   let lineaPuntatore = null;
@@ -247,7 +231,7 @@ if (fatti.length >= 2) {
   linea.addEventListener("pointermove", e => { if (e.pointerId === lineaPuntatore) { const i = indiceDa(e.clientX); if (i !== corrente) mostra(i); } });
   const fineLinea = e => { if (e.pointerId === lineaPuntatore) { lineaPuntatore = null; linea.classList.remove("trascina"); } };
   linea.addEventListener("pointerup", fineLinea); linea.addEventListener("pointercancel", fineLinea);
-  cur.addEventListener("keydown", e => {
+  linea.addEventListener("keydown", e => {
     const m = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
     if (m) { e.preventDefault(); fermaLapse(); mostra(corrente + m); }
     if (e.key === "Home") { e.preventDefault(); mostra(0); }
@@ -324,26 +308,51 @@ if (fatti.length >= 2) {
     const passo = () => {
       i++; mostra(i);
       if (i < iOggi) timer = setTimeout(passo, durata(i));
-      else { fermaLapse(); linea.querySelectorAll(".tacca-futura").forEach(t => t.classList.add("invito")); }
+      else { fermaLapse(); linea.querySelectorAll(".fotogramma.partenza").forEach(t => t.classList.add("invito")); }
     };
     timer = setTimeout(passo, 700);
   } else mostra(iOggi);
 }
 
-/* ---------------- cartoline «In autonomia»: frecce che scorrono di una cartolina ---------------- */
-document.querySelectorAll(".titolo-frecce").forEach(t => {
-  const fila = t.parentElement.querySelector(".miei"); if (!fila) return;
-  const [prec, succ] = t.querySelectorAll(".freccia");
-  const aggiorna = () => {
-    const fine = fila.scrollWidth - fila.clientWidth - 2;
-    prec.disabled = fila.scrollLeft <= 2; succ.disabled = fila.scrollLeft >= fine;
-    t.querySelector(".frecce").hidden = fila.scrollWidth <= fila.clientWidth + 2;
+/* ---------------- cartoline «In autonomia»: un mazzo aperto a ventaglio ----------------
+   Si vedono tutte. Col mouse sopra, quella puntata si raddrizza e sale e le vicine si scostano;
+   sul telefono il primo tocco la porta davanti, il secondo apre il video. */
+document.querySelectorAll(".miei").forEach(ul => {
+  const carte = [...ul.children]; const n = carte.length; if (!n) return;
+  let scelta = -1, tocco = false, daPuntatore = false;
+  const disponi = () => {
+    const W = ul.clientWidth;
+    const cw = Math.round(Math.min(200, Math.max(118, W * .34)));
+    const margine = W < 520 ? 14 : 0, inclina = W < 520 ? 2.2 : 3;
+    const passo = n > 1 ? Math.min(cw * .7, (W - cw - 2 * margine) / (n - 1)) : 0;
+    const x0 = (W - (cw + passo * (n - 1))) / 2, mezzo = (n - 1) / 2;
+    const scosta = Math.min(34, cw * .2);
+    let alta = 0;
+    carte.forEach(li => { li.style.width = cw + "px"; alta = Math.max(alta, li.offsetHeight); });
+    carte.forEach((li, i) => {
+      const d = i - mezzo;
+      let x = x0 + i * passo, y = d * d * 1.8, r = d * inclina, s = 1;
+      if (scelta >= 0 && i !== scelta) x += i < scelta ? -scosta : scosta;
+      if (i === scelta) { y = -16; r = 0; s = 1.06; }
+      li.style.transform = `translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;
+      li.style.zIndex = i === scelta ? 50 : i + 1;
+    });
+    ul.style.height = Math.round(alta + 26 + mezzo * mezzo * 1.8) + "px";
   };
-  t.querySelectorAll(".freccia").forEach(b => b.addEventListener("click", () => {
-    const passo = (fila.querySelector("li")?.offsetWidth || 160) + 12;
-    fila.scrollBy({ left: +b.dataset.dir * passo, behavior: ridotto ? "auto" : "smooth" });
-  }));
-  fila.addEventListener("scroll", aggiorna, { passive: true }); addEventListener("resize", aggiorna); aggiorna();
+  const scegli = i => { if (scelta !== i) { scelta = i; disponi(); } };
+  carte.forEach((li, i) => {
+    li.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") scegli(i); });
+    li.addEventListener("pointerdown", e => { tocco = e.pointerType !== "mouse"; daPuntatore = true; });
+    li.addEventListener("focusin", () => { if (!daPuntatore) scegli(i); }); // con la tastiera
+    // al tocco: prima la porto davanti, poi si apre
+    li.addEventListener("click", e => {
+      setTimeout(() => { daPuntatore = false; });
+      if (tocco && scelta !== i) { e.stopImmediatePropagation(); e.preventDefault(); scegli(i); }
+    }, true);
+  });
+  ul.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") { scelta = -1; disponi(); } });
+  disponi(); addEventListener("resize", disponi);
+  ul.querySelectorAll("img").forEach(im => im.addEventListener("load", disponi, { once: true }));
 });
 
 /* ---------------- carta d'imbarco: tabellone a palette e volo ---------------- */

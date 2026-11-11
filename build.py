@@ -135,6 +135,8 @@ def foto(percorso, nome, dove):
     (DIST / "foto" / "mini").mkdir(parents=True, exist_ok=True)
     (w, h), _ = salva(img, 1600, DIST / "foto" / nome, 250)
     (mw, mh), _ = salva(img, 480, DIST / "foto" / "mini" / nome, 40)
+    (DIST / "foto" / "micro").mkdir(parents=True, exist_ok=True)
+    salva(img, 160, DIST / "foto" / "micro" / nome, 12)  # per la striscia della linea del tempo
     return {"nome": nome, "w": w, "h": h, "mw": mw, "mh": mh, "colore": colore}
 
 
@@ -335,12 +337,7 @@ def main():
     miei_html = ""
     if schede_mie or altri_miei:
         altri = f'      <p class="miei-altri">E poi: {e(", ".join(altri_miei))}.</p>\n' if altri_miei else ""
-        frecce = ('<div class="frecce">'
-                  '<button class="freccia" type="button" data-dir="-1" aria-label="Cartoline precedenti"><svg viewBox="0 0 24 24" fill="none" '
-                  'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>'
-                  '<button class="freccia" type="button" data-dir="1" aria-label="Cartoline successive"><svg viewBox="0 0 24 24" fill="none" '
-                  'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>')
-        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <div class="titolo-frecce"><h2 id="t-miei">In autonomia</h2>' + frecce + '</div>\n'
+        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <h2 id="t-miei">In autonomia</h2>\n'
                      '      <p class="sezione-sotto">I viaggi fuori dai gruppi. Dove c\'è il simbolo ▶ c\'è il video che ho montato.</p>\n'
                      '      <ul class="miei">\n' + "\n".join(schede_mie) + '\n      </ul>\n' + altri + '    </section>')
 
