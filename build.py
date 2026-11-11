@@ -202,7 +202,7 @@ def main():
         shutil.rmtree(DIST)
     DIST.mkdir()
 
-    for campo in ("nome", "sottotitolo", "bio_attacco"):
+    for campo in ("nome", "sottotitolo"):
         if not (profilo.get(campo) or "").strip():
             errori.append(f"Profilo: il campo «{campo}» è vuoto")
 
@@ -529,7 +529,7 @@ def main():
         autore = f'<cite>{e(profilo["citazione_autore"])}</cite>' if (profilo.get("citazione_autore") or "").strip() else ""
         attacco = f'<span class="citazione">{versi}</span>{autore}'
     else:
-        attacco = e(profilo["bio_attacco"])
+        attacco = e(profilo.get("bio_attacco") or "")
 
     # hero
     if oggi_foto:
@@ -551,7 +551,7 @@ def main():
         "OG_IMAGE": e(og), "JSONLD": jsonld.replace("</", "<\\/"),
         "HERO_FOTO": hero, "NOME": e(profilo["nome"]), "SOTTOTITOLO": sottotitolo_html(profilo["sottotitolo"]),
         "ANNO": str(oggi.year), "RIGA_OGGI": e(profilo.get("riga_oggi", "")), "RIGA_OGGI_ATTR": e(profilo.get("riga_oggi", "")),
-        "BIO_ATTACCO": attacco, "BIO": bio_html,
+        "BIO_ATTACCO": f'      <p class="bio-attacco">{attacco}</p>\n' if attacco else "", "BIO": bio_html,
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,

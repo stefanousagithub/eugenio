@@ -27,7 +27,7 @@ content:
       - { name: descrizione_foto_oggi, label: Descrizione della foto, type: string, description: "Per chi non vede le immagini (es. «Sugli scogli al tramonto, con una tazza in mano»)." }
       - { name: inquadratura_oggi, label: Inquadratura della foto, type: number, options: { min: 0, max: 100 }, description: "0 = mostra il lato sinistro della foto, 50 = centro, 100 = lato destro." }
       - { name: riga_oggi, label: Riga di oggi, type: string, description: "Sotto «Oggi». La prossima partenza viene aggiunta in automatico." }
-      - { name: bio_attacco, label: Frase d'apertura, type: string, required: true, description: "Compare in corsivo sopra la presentazione, se non c'è una citazione." }
+      - { name: bio_attacco, label: Frase d'apertura (facoltativa), type: string, description: "Se la scrivi compare in corsivo sopra la presentazione. Se c'è una citazione, vince la citazione." }
       - { name: citazione, label: Citazione (facoltativa), type: text, description: "Qualche verso o una frase d'autore, una riga per verso. Se c'è, prende il posto della frase d'apertura." }
       - { name: citazione_autore, label: Autore della citazione, type: string }
       - { name: bio, label: Presentazione, type: text, description: "Lascia una riga vuota tra un paragrafo e l'altro." }
