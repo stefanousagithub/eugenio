@@ -289,23 +289,40 @@ def main():
     # foto
     oggi_foto = foto(profilo.get("foto_oggi"), "oggi", "Profilo")
     tessere = []
-    for v in gruppo:
+    # viaggi di gruppo: dal più recente; il primo è la copertina grande (foto grande, date complete, descrizione)
+    for ordine, v in reversed(list(enumerate(gruppo))):
+        copertina = ordine == len(gruppo) - 1
         info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
         colore = v.get("colore") or (info and info["colore"]) or "#2c2c2e"
         guida = "si" if v.get("tour_leader") else "no"
         video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
-        attr = (f'data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
+        attr = (f'data-ordine="{ordine}" data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
                 f'data-guida="{guida}" data-c="{colore}" data-foto="{v["_slug"] if info else ""}" '
                 f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}" data-video="{e(video)}" '
                 f'data-quando="{e(v["_quando"])}" data-timbro="{e(v.get("timbro") or "")}"')
         immagine = ""
         if info:
-            immagine = (f'<picture><source srcset="foto/mini/{info["nome"]}.webp" type="image/webp"><img src="foto/mini/{info["nome"]}.jpg" '
-                        f'width="{info["mw"]}" height="{info["mh"]}" alt="" loading="lazy" decoding="async" '
+            cartella = "" if copertina else "mini/"
+            w, h = (info["w"], info["h"]) if copertina else (info["mw"], info["mh"])
+            immagine = (f'<picture><source srcset="foto/{cartella}{info["nome"]}.webp" type="image/webp"><img src="foto/{cartella}{info["nome"]}.jpg" '
+                        f'width="{w}" height="{h}" alt="" loading="lazy" decoding="async" '
                         f'style="object-position:{int(v.get("inquadratura") or 50)}% 50%"></picture>')
-        badge = '<span class="badge">Tour leader</span>' if v.get("tour_leader") else ""
-        tessere.append(f'        <li {attr}><a class="tessera" href="#{v["_slug"]}" style="--c:{colore}">{badge}{immagine}'
-                       f'<span class="didascalia"><b>{e(v["titolo"])}</b><span class="anno">{v["anno"]}</span></span></a></li>')
+        timbro = v.get("timbro") if v.get("timbro") in TIMBRI else ""
+        if timbro:
+            segno = f'<img class="tessera-timbro" src="timbri/{timbro}.webp" width="300" height="300" alt="Tour leader" loading="lazy" decoding="async">'
+        else:
+            segno = '<span class="badge">Tour leader</span>' if v.get("tour_leader") else ""
+        d1 = v.get("_dal")
+        if copertina:
+            data_txt = v["_quando"]
+        elif d1:
+            data_txt = f"{MESI[d1.month - 1].capitalize()} {d1.year}"
+        else:
+            data_txt = str(v["anno"])
+        descr = f'<span class="tessera-descr">{e(v.get("riga", ""))}</span>' if copertina and v.get("riga") else ""
+        sopra = '<span class="tessera-sopra">Ultimo viaggio</span>' if copertina else ""
+        tessere.append(f'        <li {attr}{" class=\"copertina\"" if copertina else ""}><a class="tessera" href="#{v["_slug"]}" style="--c:{colore}">{immagine}{segno}'
+                       f'<span class="didascalia">{sopra}<b>{e(v["titolo"])}</b><span class="anno">{e(data_txt)}</span>{descr}</span></a></li>')
 
     # «Per conto mio»: viaggi fuori dai gruppi. Con un video la scheda lo apre; senza foto né video finiscono in «E poi»
     ICONA_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>'

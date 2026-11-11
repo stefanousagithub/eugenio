@@ -88,8 +88,8 @@ const tessere = [...document.querySelectorAll("#griglia > li")];
 const fatti = tessere.map(li => ({
   titolo: li.dataset.titolo, anno: +li.dataset.anno, mese: +li.dataset.mese || 1, guida: li.dataset.guida === "si",
   c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug, video: li.dataset.video || "",
-  quando: li.dataset.quando || "", timbro: li.dataset.timbro || ""
-}));
+  quando: li.dataset.quando || "", timbro: li.dataset.timbro || "", ordine: +li.dataset.ordine || 0
+})).sort((a, b) => a.ordine - b.ordine); // la griglia va dal più recente, la linea del tempo dal più vecchio
 const prossimo = futuri[0];
 const rigaBase = $("#p-riga").dataset.predefinita;
 let rigaOggi = rigaBase;
@@ -118,6 +118,15 @@ if (fatti.length >= 2) {
   // le partenze tratteggiate con la data. Si tocca, si trascina col dito, si usa con le frecce della tastiera
   linea.hidden = false; $("#istruzione").hidden = false;
   linea.className = "striscia"; linea.tabIndex = 0;
+  // posizioni sulla barra: passo fisso tra un viaggio e l'altro, più spazio per gli anni saltati e prima di «oggi»
+  { let x = 0; const pos = [];
+    voci.forEach((v, i) => {
+      if (i) { x += 1 + Math.max(0, v.anno - voci[i - 1].anno - 1) * .45; if (v.oggi) x += .2; if (v.futuro) x += voci[i - 1].futuro ? .55 : .5; }
+      pos.push(x);
+    });
+    voci.forEach((v, i) => v.x = 4 + pos[i] / (pos[pos.length - 1] || 1) * 92); }
+  linea.innerHTML = '<span class="barra"></span>';
+  if (futuri.length) { const f = document.createElement("span"); f.className = "barra-futura"; f.style.left = voci[iOggi].x + "%"; linea.append(f); }
   linea.setAttribute("role", "listbox"); linea.setAttribute("aria-label", "I viaggi nel tempo");
   let annoVisto = null;
   const fotogrammi = voci.map((v, i) => {
@@ -133,6 +142,7 @@ if (fatti.length >= 2) {
     let et = "";
     if (v.oggi) et = "oggi"; else if (v.futuro) et = fmtBreve(v.data); else if (v.anno !== annoVisto) { et = String(v.anno); annoVisto = v.anno; }
     const s = document.createElement("span"); s.className = "fotogramma-data"; s.textContent = et; b.append(s);
+    b.style.left = v.x + "%";
     linea.append(b); return b;
   });
   const sistemaEtichette = () => {};

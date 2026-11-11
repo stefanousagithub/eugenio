@@ -172,22 +172,24 @@ div.scheda-mia{cursor:default}
 .play svg{width:14px;height:14px;margin-left:2px}
 .miei-altri{margin-top:10px;padding:0 4px;font-size:15px;color:var(--testo-2)}
 
-/* striscia di miniature al posto della linea con le tacche */
-.striscia{position:relative;display:flex;align-items:flex-end;gap:5px;padding:10px 2px 2px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;outline-offset:4px}
+/* barra del tempo con le miniature posate sopra: la barra si vede, le foto sono piccole, quella scelta cresce */
+.striscia{position:relative;height:74px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;outline-offset:4px}
 .striscia.trascina{cursor:grabbing}
-.fotogramma{flex:1 1 0;min-width:0;max-width:52px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.fotogramma.oggi{margin-left:6px}
-.fotogramma.oggi+.fotogramma.partenza{margin-left:10px}
-.fotogramma-quadro{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:4/5;border-radius:7px;overflow:hidden;background:var(--c);color:rgba(255,255,255,.8);font:700 15px/1 var(--font-titoli);
-  box-shadow:0 0 0 1.5px rgba(255,255,255,.28);opacity:.62;transform-origin:50% 100%;transition:transform .28s var(--ease-out),opacity .28s ease,box-shadow .28s ease}
+.barra{position:absolute;left:0;right:0;top:30px;height:3px;border-radius:2px;background:rgba(255,255,255,.4)}
+.barra-futura{position:absolute;right:0;top:30px;height:3px;background-image:radial-gradient(circle,rgba(255,255,255,.85) 1.2px,transparent 1.6px);background-size:7px 3px;background-color:var(--cv)}
+.fotogramma{position:absolute;top:0;width:24px;margin-left:-12px;display:flex;flex-direction:column;align-items:center}
+.fotogramma-quadro{position:relative;display:grid;place-items:center;width:24px;height:30px;margin-top:16px;border-radius:6px;overflow:hidden;background:var(--c);color:rgba(255,255,255,.85);font:700 13px/1 var(--font-titoli);
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 2px 6px rgba(0,0,0,.3);transform-origin:50% 60%;transition:transform .28s var(--ease-out),box-shadow .28s ease}
 .fotogramma-quadro img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.fotogramma.oggi .fotogramma-quadro{border-radius:50%;aspect-ratio:1}
-.fotogramma.partenza .fotogramma-quadro{box-shadow:none;outline:1.5px dashed var(--accento);outline-offset:2px}
-.fotogramma.guida .fotogramma-quadro::after{content:"";position:absolute;left:50%;bottom:4px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--accento);box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
-.fotogramma.scelto .fotogramma-quadro{opacity:1;transform:scale(1.22) translateY(-3px);box-shadow:0 0 0 2px #fff,0 6px 14px rgba(0,0,0,.35)}
-.fotogramma.partenza.scelto .fotogramma-quadro{box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.fotogramma.oggi .fotogramma-quadro{width:28px;height:28px;margin-top:17px;border-radius:50%}
+.fotogramma.partenza .fotogramma-quadro{box-shadow:0 0 0 1.5px var(--cv),0 0 0 3px var(--accento)}
+.fotogramma.guida .fotogramma-quadro::after{content:"";position:absolute;left:50%;bottom:3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--accento);box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+.fotogramma.scelto{z-index:2}
+.fotogramma.scelto .fotogramma-quadro{transform:scale(1.6) translateY(-4px);box-shadow:0 0 0 1.5px #fff,0 8px 16px rgba(0,0,0,.4)}
+.fotogramma.partenza.scelto .fotogramma-quadro{box-shadow:0 0 0 1.5px var(--accento),0 8px 16px rgba(0,0,0,.4)}
 .striscia.trascina .fotogramma-quadro,.striscia.lapse .fotogramma-quadro{transition-duration:.12s}
-.fotogramma-data{height:13px;font-size:11.5px;line-height:13px;color:rgba(255,255,255,.74);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fotogramma-data{position:absolute;top:56px;font-size:11.5px;line-height:13px;color:rgba(255,255,255,.74);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fotogramma:first-child+.fotogramma .fotogramma-data,.fotogramma.prima .fotogramma-data{left:0}
 .fotogramma.partenza .fotogramma-data{color:var(--accento)}
 .fotogramma.scelto .fotogramma-data{color:#fff;font-weight:600}
 .fotogramma.partenza.invito .fotogramma-quadro{animation:invito-quadro 1.1s var(--ease-out) 2}
@@ -275,16 +277,32 @@ div.scheda-mia{cursor:default}
 .pill.pieno{background:var(--accento);color:#000}
 .pill svg{width:17px;height:17px}
 
-/* griglia dei viaggi fatti */
-.griglia{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
-.tessera{position:relative;display:block;scroll-margin-top:24px;width:100%;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:var(--c,var(--scheda-2));-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out),filter .16s ease}
-.tessera:active{transform:scale(.97)}
-.tessera img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.didascalia{position:absolute;left:0;right:0;bottom:0;padding:26px 9px 8px;color:#fff;font-size:13px;line-height:1.2}
-.tessera:has(img) .didascalia{padding-top:40px;background:linear-gradient(to top,rgba(0,0,0,.78),rgba(0,0,0,.4) 55%,rgba(0,0,0,0));text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.tessera b{display:block;font:700 14px/1.15 var(--font-titoli);letter-spacing:-.01em;text-wrap:balance}
-.tessera .anno{display:block;margin-top:2px;color:rgba(255,255,255,.84);font-variant-numeric:tabular-nums}
-.badge{position:absolute;z-index:1;top:8px;right:8px;padding:5px 8px;border-radius:999px;background:var(--accento);color:#000;font:700 11px/1 var(--font);letter-spacing:0}
+/* viaggi di gruppo: il più recente in copertina, gli altri in due colonne grandi.
+   Foto piena, titolo deciso, date; sui viaggi da tour leader il timbro di Eugenio fa da sigillo */
+.griglia{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.griglia .copertina{grid-column:1/-1}
+.griglia li:last-child:nth-child(even):not(.copertina){grid-column:1/-1}
+.griglia li:last-child:nth-child(even):not(.copertina) .tessera{aspect-ratio:2/1}
+.tessera{position:relative;display:block;scroll-margin-top:24px;width:100%;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:var(--c,var(--scheda-2));
+  box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 26px rgba(0,0,0,.18);-webkit-tap-highlight-color:transparent;transition:transform .2s var(--ease-out),box-shadow .3s ease}
+.copertina .tessera{aspect-ratio:5/4;border-radius:22px}
+.tessera:active{transform:scale(.98)}
+.tessera img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.tessera .tessera-timbro{inset:auto;top:10px;right:10px;width:56px;height:56px;object-fit:contain;transform:rotate(-9deg);filter:drop-shadow(0 3px 8px rgba(0,0,0,.45))}
+.copertina .tessera .tessera-timbro{width:84px;height:84px;top:14px;right:14px}
+.didascalia{position:absolute;left:0;right:0;bottom:0;padding:44px 14px 13px;color:#fff;font-size:13px;line-height:1.25;background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.45) 55%,rgba(0,0,0,0));text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.copertina .didascalia{padding:80px 20px 18px}
+.tessera b{display:block;font:800 18px/1.1 var(--font-titoli);letter-spacing:-.025em;text-wrap:balance}
+.copertina .tessera b{font-size:clamp(26px,7vw,34px)}
+.tessera .anno{display:block;margin-top:4px;color:rgba(255,255,255,.86);font-variant-numeric:tabular-nums;font-weight:500}
+.copertina .tessera .anno{font-size:14px}
+.tessera-sopra{display:inline-block;margin-bottom:8px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.2);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font:600 12px/1 var(--font)}
+.tessera-descr{display:-webkit-box;margin-top:8px;font-size:15px;line-height:1.4;color:rgba(255,255,255,.9);-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badge{position:absolute;z-index:1;top:10px;right:10px;padding:5px 8px;border-radius:999px;background:var(--accento);color:#000;font:700 11px/1 var(--font);letter-spacing:0}
+@media (hover:hover) and (pointer:fine){
+  .tessera:hover{box-shadow:0 2px 4px rgba(0,0,0,.14),0 18px 36px rgba(0,0,0,.26)}
+  .tessera:hover img:not(.tessera-timbro){transform:scale(1.05)}
+}
 
 /* contatti stile Impostazioni */
 .contatti{list-style:none;display:grid;gap:10px;margin-top:12px}
@@ -338,7 +356,7 @@ div.scheda-mia{cursor:default}
   .azioni{max-width:560px}
 }
 @media (hover:hover) and (pointer:fine){
-  .tessera:hover,.imb-testa:hover{filter:brightness(1.1)}
+  .imb-testa:hover{filter:brightness(1.1)}
   .contatto:hover,.pill:hover,.azione:hover{filter:brightness(1.07)}
   .imb-testa:hover .imb-scheda{text-decoration-color:#fff}
 }
