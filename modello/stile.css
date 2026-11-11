@@ -182,11 +182,14 @@ div.scheda-mia{cursor:default}
 .fotogramma.guida .fotogramma-punto{background:var(--accento)}
 .fotogramma.oggi .fotogramma-punto{width:13px;height:13px;margin-top:6px;background:var(--cv);box-shadow:0 0 0 2.5px #fff}
 .fotogramma.partenza .fotogramma-punto{background:var(--cv);box-shadow:0 0 0 2px var(--accento)}
-.fotogramma.scelto .fotogramma-punto{transform:scale(1.25)}
+.fotogramma.scelto .fotogramma-punto{transform:scale(1.55);box-shadow:0 0 0 2px #fff,0 0 0 6px rgba(255,255,255,.28)}
+.fotogramma.oggi.scelto .fotogramma-punto{background:#fff}
+.fotogramma.partenza.scelto .fotogramma-punto{background:var(--accento);box-shadow:0 0 0 2px #fff,0 0 0 6px color-mix(in srgb,var(--accento) 35%,transparent)}
 .fotogramma-data{position:absolute;top:24px;font-size:11.5px;line-height:13px;color:rgba(255,255,255,.74);font-variant-numeric:tabular-nums;white-space:nowrap}
 .fotogramma.partenza .fotogramma-data{color:var(--accento)}
 .fotogramma.scelto .fotogramma-data{color:#fff;font-weight:600}
-.fumetto{position:absolute;top:0;z-index:2;width:34px;margin-left:-17px;pointer-events:none;transition:left .32s var(--ease-out)}
+.fumetto{position:absolute;top:0;z-index:2;width:34px;margin-left:-17px;pointer-events:none;opacity:0;transform:translateY(6px) scale(.85);transform-origin:50% 100%;transition:left .32s var(--ease-out),opacity .18s ease,transform .22s var(--ease-out)}
+.fumetto.visibile{opacity:1;transform:none}
 .striscia.trascina .fumetto,.striscia.lapse .fumetto{transition-duration:.14s}
 .fumetto::after{content:"";position:absolute;left:50%;top:40px;width:9px;height:9px;margin-left:-4.5px;background:#fff;transform:rotate(45deg);border-radius:0 0 2px 0}
 .fumetto-foto{position:relative;z-index:1;display:grid;place-items:center;width:34px;height:42px;border-radius:8px;overflow:hidden;background:var(--c);box-shadow:0 0 0 2px #fff,0 6px 14px rgba(0,0,0,.35);color:rgba(255,255,255,.9);font:700 14px/1 var(--font-titoli)}

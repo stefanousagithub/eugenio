@@ -150,11 +150,17 @@ if (fatti.length >= 2) {
   function muoviFumetto(v) {
     const m = v.oggi ? "oggi" : v.foto;
     fumetto.style.left = v.x + "%";
-    fumetto.className = "fumetto" + (v.oggi ? " oggi" : "") + (v.futuro ? " partenza" : "");
+    fumetto.classList.toggle("oggi", !!v.oggi); fumetto.classList.toggle("partenza", !!v.futuro);
     fumettoFoto.style.setProperty("--c", v.c || coloreOggi);
     if (m) { fumettoImg.hidden = false; fumettoImg.src = `foto/micro/${m}.webp`; fumettoFoto.dataset.lettera = ""; }
     else { fumettoImg.hidden = true; fumettoFoto.dataset.lettera = v.titolo.charAt(0); }
   }
+  // il fumetto compare solo col mouse sopra un puntino (mostra quel viaggio) o mentre si trascina sulla barra
+  linea.addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse" || linea.classList.contains("trascina")) return;
+    muoviFumetto(voci[indiceDa(e.clientX)]); fumetto.classList.add("visibile");
+  });
+  linea.addEventListener("pointerleave", () => { if (!linea.classList.contains("trascina")) fumetto.classList.remove("visibile"); });
   const sistemaEtichette = () => {};
 
   // testi del pannello: l'area tiene l'altezza del viaggio più lungo, così la pagina sotto non salta
@@ -193,7 +199,7 @@ if (fatti.length >= 2) {
     tempo.style.setProperty("--cv", v.c || coloreOggi);
     fotogrammi.forEach((b, k) => { b.classList.toggle("scelto", k === i); b.setAttribute("aria-selected", k === i ? "true" : "false"); });
     linea.setAttribute("aria-activedescendant", `fotogramma-${i}`);
-    muoviFumetto(v);
+    if (linea.classList.contains("trascina")) muoviFumetto(v);
     scriviMorbido(v);
     if (v.oggi) { imgOggi.classList.add("is-on"); imgB.classList.remove("is-on"); palco.classList.remove("senza-foto"); }
     else if (v.foto) {
@@ -247,10 +253,14 @@ if (fatti.length >= 2) {
   linea.addEventListener("pointerdown", e => {
     if (lineaPuntatore !== null) return; // un dito solo
     fermaLapse(); lineaPuntatore = e.pointerId; linea.setPointerCapture(e.pointerId); linea.classList.add("trascina");
-    mostra(indiceDa(e.clientX));
+    fumetto.classList.add("visibile"); mostra(indiceDa(e.clientX));
   });
   linea.addEventListener("pointermove", e => { if (e.pointerId === lineaPuntatore) { const i = indiceDa(e.clientX); if (i !== corrente) mostra(i); } });
-  const fineLinea = e => { if (e.pointerId === lineaPuntatore) { lineaPuntatore = null; linea.classList.remove("trascina"); } };
+  const fineLinea = e => {
+    if (e.pointerId !== lineaPuntatore) return;
+    lineaPuntatore = null; linea.classList.remove("trascina");
+    if (e.pointerType !== "mouse") fumetto.classList.remove("visibile");
+  };
   linea.addEventListener("pointerup", fineLinea); linea.addEventListener("pointercancel", fineLinea);
   linea.addEventListener("keydown", e => {
     const m = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
