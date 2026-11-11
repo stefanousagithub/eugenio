@@ -342,7 +342,9 @@ def main():
                         f'width="{info["mw"]}" height="{info["mh"]}" alt="" loading="lazy" decoding="async" '
                         f'style="object-position:{int(v.get("inquadratura") or 50)}% 50%"></picture>')
         # cartolina: foto con la cornice bianca, sotto il nome del posto e l'anno
-        anno = f'<span class="anno">{v["anno"]}</span>' if v["anno"] else ""
+        d1 = v.get("_dal")
+        quando_breve = f'{MESI[d1.month - 1][:3]} {d1.year}' if d1 else (str(v["anno"]) if v["anno"] else "")
+        anno = f'<span class="anno">{quando_breve}</span>' if quando_breve else ""
         retro = f'<span class="retro"><b>{e(v["titolo"])}</b>{anno}</span>'
         if video:
             titolo_video = f'{v["titolo"]}{", " + str(v["anno"]) if v["anno"] else ""}'

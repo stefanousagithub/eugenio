@@ -134,17 +134,27 @@ if (fatti.length >= 2) {
     b.className = "fotogramma" + (v.oggi ? " oggi" : "") + (v.futuro ? " partenza" : "") + (v.guida ? " guida" : "");
     b.setAttribute("role", "option"); b.id = `fotogramma-${i}`; b.setAttribute("aria-label", `${v.titolo}, ${v.anno}`);
     b.style.setProperty("--c", v.c || coloreOggi);
-    const mini = v.oggi ? "oggi" : v.foto;
-    const quadro = document.createElement("span"); quadro.className = "fotogramma-quadro";
-    if (mini) { const im = document.createElement("img"); im.src = `foto/micro/${mini}.webp`; im.alt = ""; im.decoding = "async"; quadro.append(im); }
-    else quadro.textContent = v.titolo.charAt(0);
-    b.append(quadro);
+    const punto = document.createElement("span"); punto.className = "fotogramma-punto"; b.append(punto);
     let et = "";
     if (v.oggi) et = "oggi"; else if (v.futuro) et = fmtBreve(v.data); else if (v.anno !== annoVisto) { et = String(v.anno); annoVisto = v.anno; }
     const s = document.createElement("span"); s.className = "fotogramma-data"; s.textContent = et; b.append(s);
     b.style.left = v.x + "%";
     linea.append(b); return b;
   });
+  // una sola miniatura, a fumetto sopra il viaggio scelto: scorre lungo la barra, così le foto non si accavallano mai
+  const fumetto = document.createElement("span"); fumetto.className = "fumetto"; fumetto.setAttribute("aria-hidden", "true");
+  const fumettoFoto = document.createElement("span"); fumettoFoto.className = "fumetto-foto";
+  const fumettoImg = document.createElement("img"); fumettoImg.alt = ""; fumettoImg.decoding = "async";
+  fumettoFoto.append(fumettoImg); fumetto.append(fumettoFoto); linea.append(fumetto);
+  voci.forEach(v => { const m = v.oggi ? "oggi" : v.foto; if (m) { const im = new Image(); im.src = `foto/micro/${m}.webp`; } }); // sono piccole: le carico subito
+  function muoviFumetto(v) {
+    const m = v.oggi ? "oggi" : v.foto;
+    fumetto.style.left = v.x + "%";
+    fumetto.className = "fumetto" + (v.oggi ? " oggi" : "") + (v.futuro ? " partenza" : "");
+    fumettoFoto.style.setProperty("--c", v.c || coloreOggi);
+    if (m) { fumettoImg.hidden = false; fumettoImg.src = `foto/micro/${m}.webp`; fumettoFoto.dataset.lettera = ""; }
+    else { fumettoImg.hidden = true; fumettoFoto.dataset.lettera = v.titolo.charAt(0); }
+  }
   const sistemaEtichette = () => {};
 
   // testi del pannello: l'area tiene l'altezza del viaggio più lungo, così la pagina sotto non salta
@@ -183,6 +193,7 @@ if (fatti.length >= 2) {
     tempo.style.setProperty("--cv", v.c || coloreOggi);
     fotogrammi.forEach((b, k) => { b.classList.toggle("scelto", k === i); b.setAttribute("aria-selected", k === i ? "true" : "false"); });
     linea.setAttribute("aria-activedescendant", `fotogramma-${i}`);
+    muoviFumetto(v);
     scriviMorbido(v);
     if (v.oggi) { imgOggi.classList.add("is-on"); imgB.classList.remove("is-on"); palco.classList.remove("senza-foto"); }
     else if (v.foto) {
@@ -333,7 +344,7 @@ document.querySelectorAll(".miei").forEach(ul => {
   const disponi = () => {
     const W = ul.clientWidth;
     const cw = Math.round(Math.min(200, Math.max(118, W * .34)));
-    const margine = W < 520 ? 14 : 0, inclina = W < 520 ? 2.2 : 3;
+    const margine = W < 520 ? 24 : 0, inclina = W < 520 ? 2.2 : 3;
     const passo = n > 1 ? Math.min(cw * .7, (W - cw - 2 * margine) / (n - 1)) : 0;
     const x0 = (W - (cw + passo * (n - 1))) / 2, mezzo = (n - 1) / 2;
     const scosta = Math.min(34, cw * .2);
@@ -364,6 +375,14 @@ document.querySelectorAll(".miei").forEach(ul => {
   disponi(); addEventListener("resize", disponi);
   ul.querySelectorAll("img").forEach(im => im.addEventListener("load", disponi, { once: true }));
 });
+
+/* ---------------- viaggi di gruppo: la foto si assesta (zoom lento) quando la scheda entra nello schermo ---------------- */
+if ("IntersectionObserver" in window && !ridotto) {
+  const ossTessere = new IntersectionObserver(voci => voci.forEach(v => {
+    if (v.isIntersecting) { v.target.classList.add("vista"); ossTessere.unobserve(v.target); }
+  }), { threshold: .25 });
+  document.querySelectorAll(".griglia .tessera").forEach(t => ossTessere.observe(t));
+} else document.querySelectorAll(".griglia .tessera").forEach(t => t.classList.add("vista"));
 
 /* ---------------- carta d'imbarco: tabellone a palette e volo ---------------- */
 // le lettere scorrono in ordine come su un tabellone delle partenze, poi si fermano; l'aereo percorre la rotta.
