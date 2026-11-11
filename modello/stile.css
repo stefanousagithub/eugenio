@@ -155,21 +155,49 @@ img{display:block}
 /* sottotitolo di sezione */
 .sezione-sotto{margin-top:4px;padding:0 4px;font-size:15px;color:var(--testo-2);text-wrap:pretty}
 
-/* «Per conto mio»: una fila che scorre di lato, come gli album nelle Foto */
-.miei{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:42%;gap:8px;margin:12px -16px 0;padding:0 16px 4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+/* «In autonomia»: cartoline in fila. Leggermente storte come appoggiate sul tavolo;
+   col mouse sopra quella puntata si raddrizza e si avvicina, le altre restano dove sono */
+.titolo-frecce{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.frecce{display:flex;gap:8px;padding-right:2px}
+.freccia{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:var(--tinta);color:var(--testo);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out),opacity .2s ease}
+.freccia svg{width:18px;height:18px}
+.freccia:active{transform:scale(.92)}
+.freccia:disabled{opacity:.3;cursor:default}
+.miei{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:44%;gap:12px;margin:4px -16px 0;padding:18px 16px 22px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .miei::-webkit-scrollbar{display:none}
 .miei li{scroll-snap-align:start}
-.scheda-mia{position:relative;display:block;width:100%;aspect-ratio:4/5;padding:0;border:0;border-radius:14px;overflow:hidden;background:var(--c,var(--scheda-2));color:#fff;text-align:left;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s var(--ease-out),filter .16s ease}
+.scheda-mia{position:relative;display:block;width:100%;padding:7px 7px 0;border:0;border-radius:6px;background:#f6f4ef;color:#1c1c1e;text-align:left;font:inherit;cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.18),0 8px 20px rgba(0,0,0,.22);transform:rotate(-1.6deg);-webkit-tap-highlight-color:transparent;
+  transition:transform .45s cubic-bezier(.2,.9,.25,1),box-shadow .45s cubic-bezier(.2,.9,.25,1)}
+.miei li:nth-child(even) .scheda-mia{transform:rotate(1.4deg)}
+.miei li:nth-child(3n) .scheda-mia{transform:rotate(-.6deg)}
 div.scheda-mia{cursor:default}
-.scheda-mia:active{transform:scale(.97)}
-.scheda-mia img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.scheda-mia .didascalia{background:linear-gradient(to top,rgba(0,0,0,.78),rgba(0,0,0,.4) 55%,rgba(0,0,0,0));padding-top:40px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.scheda-mia b{display:block;font:700 15px/1.15 var(--font-titoli);letter-spacing:-.01em;text-wrap:balance}
-.scheda-mia .anno{display:block;margin-top:2px;font-size:13px;color:rgba(255,255,255,.84);font-variant-numeric:tabular-nums}
+.cartolina-foto{position:relative;display:block;aspect-ratio:4/5;border-radius:3px;overflow:hidden;background:var(--c,var(--scheda-2))}
+.cartolina-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.retro{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:9px 3px 10px}
+.retro b{font:700 14px/1.2 var(--font-titoli);letter-spacing:-.01em;text-wrap:balance}
+.retro .anno{flex:none;font-size:13px;color:rgba(60,60,67,.7);font-variant-numeric:tabular-nums}
+.scheda-mia:active{transform:rotate(0) scale(.97)!important}
 .play{position:absolute;z-index:1;top:8px;right:8px;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);color:#000;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .play svg{width:14px;height:14px;margin-left:2px}
 .miei-altri{margin-top:10px;padding:0 4px;font-size:15px;color:var(--testo-2)}
-@media (min-width:560px){.miei{grid-auto-columns:31%;margin:12px 0 0;padding:0 0 4px;scroll-padding:0}}
+@media (hover:hover) and (pointer:fine){
+  .miei li{position:relative}
+  .miei li:hover{z-index:2}
+  .miei li:hover .scheda-mia{transform:rotate(0) scale(1.07) translateY(-6px)!important;box-shadow:0 2px 4px rgba(0,0,0,.18),0 18px 36px rgba(0,0,0,.32)}
+}
+@media (min-width:560px){.miei{grid-auto-columns:31%;margin:4px -12px 0;padding:22px 12px 26px;scroll-padding:0 12px}}
+
+/* pannello «Oggi»: prossime partenze e numeri, così lo spazio non resta vuoto */
+.pannello-oggi{margin-top:14px;display:grid;gap:12px}
+.prossime{display:grid;gap:6px}
+.prossima{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.12);color:#fff;transition:background-color .16s ease,transform .16s var(--ease-out)}
+.prossima:active{transform:scale(.98)}
+.prossima b{font-weight:600}
+.prossima span:last-child{margin-left:auto;font-size:14px;color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums;white-space:nowrap}
+.prossima-pallino{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid var(--accento)}
+.pannello-numeri{font:600 14px/1.3 var(--font);color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums}
+@media (hover:hover) and (pointer:fine){.prossima:hover{background:rgba(255,255,255,.2)}}
 
 /* mappa: un SVG statico ritagliato sull'area visitata; «Espandi» la apre a tutto schermo */
 .mappa-box{margin-top:12px;padding:12px;border-radius:18px;background:var(--scheda)}
@@ -313,4 +341,5 @@ html{scroll-padding-bottom:110px}
   .palco,.pannello,.cursore,.tessera,.azione,.pill,.scatto,.palco-titolo,.guarda{transition-duration:.01ms!important}
   .schermo[open]{animation:none}
   .cella.gira span,.tacca-futura.invito::after,.timbro.stampa{animation:none}
+  .scheda-mia,.freccia,.prossima{transition-duration:.01ms!important}
 }

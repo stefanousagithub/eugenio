@@ -322,19 +322,25 @@ def main():
             immagine = (f'<picture><source srcset="foto/mini/{info["nome"]}.webp" type="image/webp"><img src="foto/mini/{info["nome"]}.jpg" '
                         f'width="{info["mw"]}" height="{info["mh"]}" alt="" loading="lazy" decoding="async" '
                         f'style="object-position:{int(v.get("inquadratura") or 50)}% 50%"></picture>')
+        # cartolina: foto con la cornice bianca, sotto il nome del posto e l'anno
         anno = f'<span class="anno">{v["anno"]}</span>' if v["anno"] else ""
-        didascalia = f'<span class="didascalia"><b>{e(v["titolo"])}</b>{anno}</span>'
+        retro = f'<span class="retro"><b>{e(v["titolo"])}</b>{anno}</span>'
         if video:
             titolo_video = f'{v["titolo"]}{", " + str(v["anno"]) if v["anno"] else ""}'
             schede_mie.append(f'        <li><button class="scheda-mia" type="button" data-video="{e(video)}" data-titolo="{e(titolo_video)}" data-c="{colore}" '
-                              f'style="--c:{colore}" aria-label="Guarda il video: {e(titolo_video)}">{immagine}'
-                              f'<span class="play">{ICONA_PLAY}</span>{didascalia}</button></li>')
+                              f'style="--c:{colore}" aria-label="Guarda il video: {e(titolo_video)}"><span class="cartolina-foto">{immagine}'
+                              f'<span class="play">{ICONA_PLAY}</span></span>{retro}</button></li>')
         else:
-            schede_mie.append(f'        <li><div class="scheda-mia" style="--c:{colore}">{immagine}{didascalia}</div></li>')
+            schede_mie.append(f'        <li><div class="scheda-mia" style="--c:{colore}"><span class="cartolina-foto">{immagine}</span>{retro}</div></li>')
     miei_html = ""
     if schede_mie or altri_miei:
         altri = f'      <p class="miei-altri">E poi: {e(", ".join(altri_miei))}.</p>\n' if altri_miei else ""
-        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <h2 id="t-miei">In autonomia</h2>\n'
+        frecce = ('<div class="frecce">'
+                  '<button class="freccia" type="button" data-dir="-1" aria-label="Cartoline precedenti"><svg viewBox="0 0 24 24" fill="none" '
+                  'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>'
+                  '<button class="freccia" type="button" data-dir="1" aria-label="Cartoline successive"><svg viewBox="0 0 24 24" fill="none" '
+                  'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>')
+        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <div class="titolo-frecce"><h2 id="t-miei">In autonomia</h2>' + frecce + '</div>\n'
                      '      <p class="sezione-sotto">I viaggi fuori dai gruppi. Dove c\'è il simbolo ▶ c\'è il video che ho montato.</p>\n'
                      '      <ul class="miei">\n' + "\n".join(schede_mie) + '\n      </ul>\n' + altri + '    </section>')
 

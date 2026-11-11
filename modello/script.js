@@ -95,9 +95,12 @@ const rigaBase = $("#p-riga").dataset.predefinita;
 let rigaOggi = rigaBase;
 if (inCorso) {
   rigaOggi = `Adesso sono in viaggio: ${inCorso.titolo}, giorno ${giorni(inCorso.dal, oggi) + 1} di ${giorni(inCorso.dal, inCorso.al) + 1}.`;
-} else if (prossimo) {
-  rigaOggi = `${rigaBase} Prossima partenza ${prossimo.mancano === 1 ? "domani" : "tra " + prossimo.mancano + NBSP + "giorni"}: ${prossimo.titolo}.`;
 }
+// pannello «Oggi»: le prossime partenze con il conto dei giorni, calcolato a ogni visita dalla data di oggi
+const tra = n => n > 1 ? `tra ${n}${NBSP}giorni` : n === 1 ? "domani" : "in viaggio";
+$("#p-prossime").innerHTML = futuri.map(f =>
+  `<a class="prossima" href="#imb-${f.slug}"><span class="prossima-pallino" aria-hidden="true"></span><b>${f.titolo}</b>` +
+  `<span>${fmtBreve(f.data)} · ${tra(f.mancano)}</span></a>`).join("");
 $("#p-riga").textContent = rigaOggi;
 const voci = [...fatti,
   { titolo: "Oggi", anno: oggi.getFullYear(), oggi: true, riga: rigaOggi, c: null },
@@ -164,6 +167,7 @@ if (fatti.length >= 2) {
     $("#p-ruolo").hidden = !v.guida;
     $("#p-video").hidden = !v.video;
     $("#p-partenza").hidden = !v.futuro;
+    $("#p-oggi").hidden = !v.oggi;
     if (v.futuro) $("#p-partenza").href = `#imb-${v.slug}`;
     const q = $("#p-quando"); q.hidden = !v.quando; q.textContent = v.quando || "";
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
@@ -325,6 +329,22 @@ if (fatti.length >= 2) {
     timer = setTimeout(passo, 700);
   } else mostra(iOggi);
 }
+
+/* ---------------- cartoline «In autonomia»: frecce che scorrono di una cartolina ---------------- */
+document.querySelectorAll(".titolo-frecce").forEach(t => {
+  const fila = t.parentElement.querySelector(".miei"); if (!fila) return;
+  const [prec, succ] = t.querySelectorAll(".freccia");
+  const aggiorna = () => {
+    const fine = fila.scrollWidth - fila.clientWidth - 2;
+    prec.disabled = fila.scrollLeft <= 2; succ.disabled = fila.scrollLeft >= fine;
+    t.querySelector(".frecce").hidden = fila.scrollWidth <= fila.clientWidth + 2;
+  };
+  t.querySelectorAll(".freccia").forEach(b => b.addEventListener("click", () => {
+    const passo = (fila.querySelector("li")?.offsetWidth || 160) + 12;
+    fila.scrollBy({ left: +b.dataset.dir * passo, behavior: ridotto ? "auto" : "smooth" });
+  }));
+  fila.addEventListener("scroll", aggiorna, { passive: true }); addEventListener("resize", aggiorna); aggiorna();
+});
 
 /* ---------------- carta d'imbarco: tabellone a palette e volo ---------------- */
 // le lettere scorrono in ordine come su un tabellone delle partenze, poi si fermano; l'aereo percorre la rotta.
