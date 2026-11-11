@@ -39,7 +39,8 @@ document.querySelectorAll(".imbarco").forEach(li => {
     else if (iscritti >= minimo) { stato = "Confermato"; cls = "stato-ok"; }
     li.querySelector("[data-stato]").innerHTML = `<strong class="${cls}">${stato}</strong><span>${iscritti} ${iscritti === 1 ? "iscritto" : "iscritti"} su ${posti}${d.codice ? ` · cod.${NBSP}${d.codice}` : ""}</span>`;
   }
-  futuri.push({ titolo: d.destinazione, data: dal, guida: d.guida === "si", c: d.c, mancano, slug: d.slug, foto: d.foto || "" });
+  futuri.push({ titolo: d.destinazione, data: dal, guida: d.guida === "si", c: d.c, mancano, slug: d.slug, foto: d.foto || "",
+    quando: d.quando || "", descrizione: d.descrizione || "", timbro: d.timbro || "" });
 });
 const sezPartenze = $("#partenze");
 if (sezPartenze && !document.querySelector(".imbarco")) sezPartenze.hidden = true;
@@ -86,7 +87,8 @@ if (mappaSchermo) {
 const tessere = [...document.querySelectorAll("#griglia > li")];
 const fatti = tessere.map(li => ({
   titolo: li.dataset.titolo, anno: +li.dataset.anno, mese: +li.dataset.mese || 1, guida: li.dataset.guida === "si",
-  c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug, video: li.dataset.video || ""
+  c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug, video: li.dataset.video || "",
+  quando: li.dataset.quando || "", timbro: li.dataset.timbro || ""
 }));
 const prossimo = futuri[0];
 const rigaBase = $("#p-riga").dataset.predefinita;
@@ -100,7 +102,8 @@ $("#p-riga").textContent = rigaOggi;
 const voci = [...fatti,
   { titolo: "Oggi", anno: oggi.getFullYear(), oggi: true, riga: rigaOggi, c: null },
   ...futuri.map(f => ({ titolo: f.titolo, anno: f.data.getFullYear(), futuro: true, data: f.data, guida: f.guida, c: f.c, slug: f.slug,
-    foto: f.foto, pos: "50", riga: `Prossima tappa: parto il ${fmtLungo(f.data)}${f.guida ? ", da tour leader" : ""}.` }))];
+    foto: f.foto, pos: "50", timbro: f.timbro, quando: `${f.quando} · prossima partenza`,
+    riga: f.descrizione || `Prossima tappa: parto il ${fmtLungo(f.data)}${f.guida ? ", da tour leader" : ""}.` }))];
 const iOggi = voci.findIndex(v => v.oggi);
 
 if (fatti.length >= 2) {
@@ -161,6 +164,8 @@ if (fatti.length >= 2) {
     $("#p-ruolo").hidden = !v.guida;
     $("#p-video").hidden = !v.video;
     $("#p-partenza").hidden = !v.futuro;
+    if (v.futuro) $("#p-partenza").href = `#imb-${v.slug}`;
+    const q = $("#p-quando"); q.hidden = !v.quando; q.textContent = v.quando || "";
     const fr = $("#p-frase"); fr.hidden = !v.frase; fr.textContent = v.frase ? `«${v.frase}»` : "";
   }
   let corrente = iOggi;
@@ -190,6 +195,15 @@ if (fatti.length >= 2) {
       imgOggi.classList.remove("is-on"); imgB.classList.remove("is-on");
       titoloPalco.textContent = v.titolo; palco.classList.add("senza-foto");
     }
+    // timbro di Eugenio sui viaggi da tour leader: si «stampa» sulla foto
+    const tb = $("#p-timbro");
+    if (v.timbro) {
+      const nuovo = `timbri/${v.timbro}.webp`;
+      if (tb.hidden || tb.getAttribute("src") !== nuovo) {
+        tb.src = nuovo; tb.hidden = false;
+        tb.classList.remove("stampa"); void tb.offsetWidth; tb.classList.add("stampa");
+      }
+    } else tb.hidden = true;
     $("#annuncio").textContent = `${v.titolo}, ${v.anno}`;
     precarica(i - 1); precarica(i + 1);
   }

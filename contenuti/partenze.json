@@ -16,6 +16,29 @@
     "mostra_in_viaggio": false,
     "foto": "/foto/caricate/finlandia-aurora.jpg",
     "tabellone": "",
-    "minimo": 3
+    "minimo": 3,
+    "descrizione": "Un’avventura invernale fiabesca nel cuore della Lapponia, pensata per cacciare la magia delle aurore boreali tra foreste innevate e laghi ghiacciati, usando ciaspole e slitte trainate da husky.",
+    "timbro": "freddo"
+  },
+  {
+    "titolo": "Costa Rica Discovery",
+    "destinazione": "Costa Rica",
+    "tappe": "",
+    "da": "Roma",
+    "dal": "2027-01-08",
+    "al": "2027-01-23",
+    "codice": "0791",
+    "tour_leader": true,
+    "scheda": "https://www.viaggiavventurenelmondo.it/viaggi/9702",
+    "iscrizione": "https://www.viaggiavventurenelmondo.it/prenotazioni/viag-pren-onli-inf.php?campo15390=0791&campo15020=Costa%20Rica%20Discovery&campo15030=2027-01-08",
+    "colore": "#1d5a3c",
+    "posti": null,
+    "iscritti": null,
+    "mostra_in_viaggio": false,
+    "foto": "/foto/caricate/costarica-monteverde.jpg",
+    "tabellone": "",
+    "minimo": 3,
+    "timbro": "natura",
+    "descrizione": "«Costa Rica, pura vida» è il motto di questo viaggio durante il quale si esploreranno parchi nazionali, vulcani attivi, ponti sospesi e spiagge oceaniche. Perfetto per chi ama natura e fauna selvagge."
   }
 ]

@@ -77,6 +77,38 @@ def righe_tabellone(testo, larghezza=11, max_righe=3):
     return [r[:larghezza] for r in righe][:max_righe] or [testo.upper()[:larghezza]]
 
 
+TIMBRI = ("freddo", "natura", "mare")  # i tre loghi di Eugenio, in modello/timbri/
+
+
+def data_viaggio(s, dove):
+    """Accetta AAAA-MM-GG oppure AAAA-MM (quando ricordo solo il mese). Ritorna (data, solo_mese) o (None, False)."""
+    s = str(s or "").strip()
+    if not s:
+        return None, False
+    try:
+        if len(s) == 7:
+            return dt.date.fromisoformat(s + "-01"), True
+        return dt.date.fromisoformat(s), False
+    except ValueError:
+        errori.append(f"{dove}: la data «{s}» non è valida (formato AAAA-MM-GG, oppure AAAA-MM se ricordi solo il mese)")
+        return None, False
+
+
+def quando(dal, al, solo_mese=False):
+    """«Dal 21 febbraio al 3 marzo 2019», «Dal 15 al 22 settembre 2023», «Gennaio 2023»."""
+    if not dal:
+        return ""
+    if solo_mese:
+        return f"{MESI[dal.month - 1].capitalize()} {dal.year}"
+    if not al or al == dal:
+        return f"{dal.day} {MESI[dal.month - 1]} {dal.year}"
+    if (dal.year, dal.month) == (al.year, al.month):
+        return f"Dal {dal.day} al {al.day} {MESI[al.month - 1]} {al.year}"
+    if dal.year == al.year:
+        return f"Dal {dal.day} {MESI[dal.month - 1]} al {al.day} {MESI[al.month - 1]} {al.year}"
+    return f"Dal {dal.day} {MESI[dal.month - 1]} {dal.year} al {al.day} {MESI[al.month - 1]} {al.year}"
+
+
 def colore_valido(c):
     return bool(re.fullmatch(r"#[0-9a-fA-F]{6}", c or ""))
 
@@ -123,7 +155,8 @@ def iscritti_avventure(codice, giorno):
         if not nuovi:
             return None
         for t in nuovi:
-            if t.get("code") == codice and isinstance(t.get("pax"), int) and isinstance(t.get("paxMax"), int):
+            if (str(t.get("code", "")).endswith("-" + codice) and t.get("startDate") == giorno
+                    and isinstance(t.get("pax"), int) and isinstance(t.get("paxMax"), int)):
                 return t["pax"], t["paxMax"]
             visti.add(t.get("id"))
     return None
@@ -145,6 +178,10 @@ ICONA_MAIL = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
               'stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>')
 ICONA_BUSSOLA = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
                  'stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.1 4.9-4.9 2.1 2.1-4.9 4.9-2.1Z"/></svg>')
+
+
+ICONA_LISTA = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+               'stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg>')
 
 
 def riga_contatto(href, colore, icona, titolo, sotto, cta):
@@ -181,17 +218,16 @@ def main():
         if not colore_valido(p.get("colore")):
             p["colore"] = "#2c2c2e"
         if al < oggi:
-            viaggi.append({"titolo": p.get("titolo") or p.get("destinazione"), "anno": dal.year, "mese": dal.month,
-                           "tour_leader": bool(p.get("tour_leader")), "foto": p.get("foto", ""), "inquadratura": 50,
-                           "colore": p["colore"], "frase": "", "scheda": p.get("scheda", ""), "tipo": "gruppo",
-                           "paese": p.get("paese") or p.get("destinazione") or "", "video": "",
-                           "riga": f"Con Avventure nel Mondo{', cod. ' + p['codice'] if p.get('codice') else ''}, "
-                                   f"dal {dal.day} {MESI[dal.month - 1]} al {al.day} {MESI[al.month - 1]}."})
+            viaggi.append({"titolo": p.get("titolo") or p.get("destinazione"), "dal": p.get("dal"), "al": p.get("al"),
+                           "tour_leader": bool(p.get("tour_leader")), "timbro": p.get("timbro", ""), "foto": p.get("foto", ""),
+                           "inquadratura": 50, "colore": p["colore"], "frase": "", "scheda": p.get("scheda", ""), "tipo": "gruppo",
+                           "paese": p.get("paese") or p.get("destinazione") or "", "video": "", "mostra": True,
+                           "riga": p.get("descrizione") or f"Con Avventure nel Mondo{', cod. ' + p['codice'] if p.get('codice') else ''}."})
             continue
         p["_dal"], p["_al"] = dal, al
         if p.get("codice") and not p.get("posti") and not a.offline:
             try:
-                r = iscritti_avventure(f"{dal.year}-{p['codice']}", dal.isoformat())
+                r = iscritti_avventure(str(p["codice"]).strip(), dal.isoformat())
                 if r:
                     p["iscritti"], p["posti"] = r
                     print(f"{dove}: {r[0]} iscritti su {r[1]} dal sito di Avventure")
@@ -206,14 +242,26 @@ def main():
     for i, v in enumerate(viaggi, 1):
         dove = f"Viaggio {i} ({v.get('titolo') or 'senza titolo'})"
         v["tipo"] = "personale" if v.get("tipo") == "personale" else "gruppo"
-        try:
-            v["anno"] = int(v.get("anno"))
-        except (TypeError, ValueError):
-            v["anno"] = None if v["tipo"] == "personale" and not str(v.get("anno") or "").strip() else v.get("anno")
-        try:
-            v["mese"] = min(12, max(1, int(v.get("mese") or 1)))
-        except (TypeError, ValueError):
-            v["mese"] = 1
+        d1, solo_mese = data_viaggio(v.get("dal"), dove)
+        d2, _ = data_viaggio(v.get("al"), dove)
+        if d1 and d2 and d2 < d1:
+            errori.append(f"{dove}: il ritorno è prima della partenza")
+        v["_dal"], v["_al"] = d1, d2
+        v["_quando"] = quando(d1, d2, solo_mese)
+        if d1:
+            v["anno"], v["mese"] = d1.year, d1.month
+        else:
+            try:
+                v["anno"] = int(v.get("anno"))
+            except (TypeError, ValueError):
+                v["anno"] = None if v["tipo"] == "personale" and not str(v.get("anno") or "").strip() else v.get("anno")
+            try:
+                v["mese"] = min(12, max(1, int(v.get("mese") or 1)))
+            except (TypeError, ValueError):
+                v["mese"] = 1
+            v["_quando"] = str(v["anno"]) if v.get("anno") else ""
+        if v.get("timbro") and v["timbro"] not in TIMBRI:
+            errori.append(f"{dove}: il timbro «{v['timbro']}» non esiste (scegli tra {', '.join(TIMBRI)})")
         if not (v.get("titolo") or "").strip():
             errori.append(f"{dove}: manca il titolo")
         if v["anno"] is None:
@@ -224,9 +272,9 @@ def main():
             errori.append(f"{dove}: il colore «{v['colore']}» non è valido (formato #RRGGBB)")
     if errori:
         sys.exit("La build si è fermata. Da correggere:\n- " + "\n- ".join(errori))
-    viaggi.sort(key=lambda v: (v["anno"] or 9999, v.get("mese") or 1))
+    viaggi.sort(key=lambda v: (v["_dal"] or dt.date(v["anno"] or 9999, v.get("mese") or 1, 1)))
     gruppo = [v for v in viaggi if v["tipo"] == "gruppo"]  # linea del tempo e griglia
-    personali = [v for v in viaggi if v["tipo"] == "personale"]  # sezione «Per conto mio»
+    personali = [v for v in viaggi if v["tipo"] == "personale"]  # sezione «In autonomia»
 
     # slug unici (servono ai link condivisibili #nome-viaggio)
     usati = set()
@@ -246,7 +294,8 @@ def main():
         video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
         attr = (f'data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
                 f'data-guida="{guida}" data-c="{colore}" data-foto="{v["_slug"] if info else ""}" '
-                f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}" data-video="{e(video)}"')
+                f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}" data-video="{e(video)}" '
+                f'data-quando="{e(v["_quando"])}" data-timbro="{e(v.get("timbro") or "")}"')
         immagine = ""
         if info:
             immagine = (f'<picture><source srcset="foto/mini/{info["nome"]}.webp" type="image/webp"><img src="foto/mini/{info["nome"]}.jpg" '
@@ -260,6 +309,8 @@ def main():
     ICONA_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg>'
     schede_mie, altri_miei = [], []
     for v in personali:
+        if v.get("mostra") is False:
+            continue  # nei dati ma nascosto: lo decide Eugenio dal CMS
         info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
         video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
         if not info and not video:
@@ -283,8 +334,8 @@ def main():
     miei_html = ""
     if schede_mie or altri_miei:
         altri = f'      <p class="miei-altri">E poi: {e(", ".join(altri_miei))}.</p>\n' if altri_miei else ""
-        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <h2 id="t-miei">Per conto mio</h2>\n'
-                     '      <p class="sezione-sotto">Fuori dai viaggi di gruppo. Dove c\'è il simbolo ▶ c\'è il video che ho montato.</p>\n'
+        miei_html = ('    <section class="sezione" aria-labelledby="t-miei">\n      <h2 id="t-miei">In autonomia</h2>\n'
+                     '      <p class="sezione-sotto">I viaggi fuori dai gruppi. Dove c\'è il simbolo ▶ c\'è il video che ho montato.</p>\n'
                      '      <ul class="miei">\n' + "\n".join(schede_mie) + '\n      </ul>\n' + altri + '    </section>')
 
     # crediti delle foto non di Eugenio
@@ -332,8 +383,12 @@ def main():
         ruolo_dd = "Eugenio" if p.get("tour_leader") else "Partecipante"
         aereo = ('<g class="volo-aereo"><path d="M-7-1.2H3L8-.4Q9.6 0 8 .4L3 1.2H-7L-9 4.5H-10.5L-9.2 0-10.5-4.5H-9Z"/>'
                  '<path d="M-1.5-1H2.5L-3.5-8.5H-5.5ZM-1.5 1H2.5L-3.5 8.5H-5.5Z"/></g>')
-        blocchi.append(f'''        <li class="imbarco{' con-foto' if info_foto else ''}" data-slug="{slug(dest)}" data-destinazione="{e(dest)}" data-dal="{dal}" data-al="{al}"
-            data-guida="{guida}" data-posti="{posti}" data-iscritti="{iscr}" data-minimo="{minimo}" data-codice="{e(p.get('codice') or '')}" data-foto="{info_foto["nome"] if info_foto else ""}"
+        timbro = p.get("timbro") if p.get("timbro") in TIMBRI else ""
+        img_timbro = (f'<img class="imb-timbro" src="timbri/{timbro}.webp" width="300" height="300" alt="" loading="lazy" decoding="async">'
+                      if timbro else "")
+        descr = f'<span class="imb-descrizione">{e(p["descrizione"])}</span>' if p.get("descrizione") else ""
+        blocchi.append(f'''        <li class="imbarco{' con-foto' if info_foto else ''}" id="imb-{slug(dest)}" data-slug="{slug(dest)}" data-destinazione="{e(dest)}" data-dal="{dal}" data-al="{al}"
+            data-guida="{guida}" data-posti="{posti}" data-iscritti="{iscr}" data-minimo="{minimo}" data-timbro="{timbro}" data-quando="{e(quando(dal, al))}" data-descrizione="{e(p.get("descrizione") or "")}" data-codice="{e(p.get('codice') or '')}" data-foto="{info_foto["nome"] if info_foto else ""}"
             data-in-viaggio="{"si" if p.get("mostra_in_viaggio") else "no"}" data-c="{p["colore"]}" style="--c:{p["colore"]}">
           <{testa_tag} class="imb-testa"{href}>
             {sfondo}
@@ -347,10 +402,11 @@ def main():
               <span class="imb-citta"><small>A</small>{e(dest)}</span>
             </span>
             {tappe}
+            {descr}
             <span class="imb-campi" role="list">
               <span role="listitem"><span class="dt">Ritorno</span><span class="dd" data-data="al">{al.day} {MESI[al.month - 1][:3]}</span></span>
               <span role="listitem"><span class="dt">Durata</span><span class="dd">{durata} giorni</span></span>
-              <span role="listitem"><span class="dt">{ruolo_dt}</span><span class="dd">{ruolo_dd}</span></span>
+              {f'<span role="listitem" class="campo-timbro"><span class="sr">{ruolo_dt}: {ruolo_dd}</span>{img_timbro}</span>' if img_timbro else f'<span role="listitem"><span class="dt">{ruolo_dt}</span><span class="dd">{ruolo_dd}</span></span>'}
             </span>
           {testa_fine}
           <div class="strappo" aria-hidden="true"></div>
@@ -365,12 +421,18 @@ def main():
             </div>
           </div>
         </li>''')
+    decalogo = ""
+    if (profilo.get("link_decalogo") or "").startswith("https://"):
+        decalogo = ('      <a class="contatto decalogo" href="' + e(profilo["link_decalogo"]) + '" target="_blank" rel="noopener">'
+                    '<span class="contatto-icona" style="--i:#ff9f0a">' + ICONA_LISTA + '</span>'
+                    '<span class="testi"><b>Prima di partire</b><small>Il decalogo di Avventure nel Mondo</small></span>'
+                    '<span class="contatto-cta">Leggi</span></a>\n')
     partenze_html = ""
     if blocchi:
         titolo_sez = "Prossima partenza" if len(blocchi) == 1 else "Prossime partenze"
         partenze_html = (f'    <section class="sezione" id="partenze" aria-labelledby="t-partenze">\n'
                          f'      <h2 id="t-partenze">{titolo_sez}</h2>\n      <ul class="imbarchi">\n'
-                         + "\n".join(blocchi) + "\n      </ul>\n    </section>")
+                         + "\n".join(blocchi) + "\n      </ul>\n" + decalogo + "    </section>")
 
     # paesi: il campo «Paese» può averne più d'uno separati da virgola (es. Balcani). L'Italia è casa, non la conto
     def paesi_di(v):
@@ -391,7 +453,7 @@ def main():
 
     # numeri: si calcolano dai dati, quindi sono sempre veri
     n_guida = sum(1 for v in gruppo if v.get("tour_leader"))
-    numeri = f"{len(gruppo)} viaggi di gruppo"
+    numeri = f"{len(gruppo)} viaggi con Avventure"
     if n_guida:
         numeri += f", {n_guida} da tour leader"
     if len(paesi_tutti) > 1:
@@ -400,7 +462,7 @@ def main():
     # mappa: in accento i paesi dei viaggi di gruppo, in tono neutro i miei, tratteggiata la prossima meta.
     # Nella pagina è ritagliata sull'area visitata; «Espandi» la apre a tutto schermo con il mondo intero e gli elenchi
     mappa_html = mappa_schermo = ""
-    if len(paesi_tutti) >= 3:
+    if len(paesi_tutti) >= 3 and profilo.get("mostra_mappa"):
         categorie = {**{n: "prossimo" for n in paesi_prossimi}, **{n: "mio" for n in paesi_miei}, **{n: "gruppo" for n in paesi_gruppo}}
         svg, sconosciuti = mappa_svg(categorie, f"Mappa dei paesi visitati: {', '.join(paesi_tutti)}")
         for n in sconosciuti:
@@ -460,6 +522,15 @@ def main():
     else:
         azione = f'<a class="azione" href="https://ig.me/m/{e(ig)}" target="_blank" rel="noopener">{ICONA_MSG}Scrivimi su Instagram</a>'
 
+    # bio: paragrafi separati da una riga vuota; se c'è una citazione prende il posto della frase d'apertura
+    bio_html = "".join(f'<p class="bio-resto">{e(par.strip())}</p>' for par in (profilo.get("bio") or "").split("\n\n") if par.strip())
+    if (profilo.get("citazione") or "").strip():
+        versi = "<br>".join(e(r.strip()) for r in profilo["citazione"].strip().splitlines() if r.strip())
+        autore = f'<cite>{e(profilo["citazione_autore"])}</cite>' if (profilo.get("citazione_autore") or "").strip() else ""
+        attacco = f'<span class="citazione">{versi}</span>{autore}'
+    else:
+        attacco = e(profilo["bio_attacco"])
+
     # hero
     if oggi_foto:
         hero = picture(oggi_foto, "scatto is-on", profilo.get("descrizione_foto_oggi") or profilo["nome"],
@@ -480,7 +551,7 @@ def main():
         "OG_IMAGE": e(og), "JSONLD": jsonld.replace("</", "<\\/"),
         "HERO_FOTO": hero, "NOME": e(profilo["nome"]), "SOTTOTITOLO": sottotitolo_html(profilo["sottotitolo"]),
         "ANNO": str(oggi.year), "RIGA_OGGI": e(profilo.get("riga_oggi", "")), "RIGA_OGGI_ATTR": e(profilo.get("riga_oggi", "")),
-        "BIO_ATTACCO": e(profilo["bio_attacco"]), "BIO": e(profilo.get("bio", "")),
+        "BIO_ATTACCO": attacco, "BIO": bio_html,
         "PARTENZE": partenze_html, "GRIGLIA": "\n".join(tessere), "CONTATTI": "\n".join(contatti),
         "MOTTO": f'<p class="piede-motto" translate="no">{e(profilo["motto"])}</p>' if profilo.get("motto") else "",
         "AZIONE": azione,
@@ -494,6 +565,7 @@ def main():
     pagina = re.sub(r"\{\{([A-Z_]+)\}\}", lambda x: sostituzioni[x.group(1)], pagina)
     (DIST / "index.html").write_text(pagina, encoding="utf-8")
 
+    shutil.copytree(RADICE / "modello" / "timbri", DIST / "timbri")
     (DIST / ".nojekyll").write_text("")
     if (RADICE / "CNAME").exists():
         shutil.copy(RADICE / "CNAME", DIST / "CNAME")

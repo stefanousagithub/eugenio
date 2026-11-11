@@ -12,6 +12,7 @@
         <img class="scatto" id="scatto-b" alt="" hidden decoding="async">
         <p class="palco-titolo" id="palco-titolo" aria-hidden="true"></p>
       </div>
+      <img class="timbro" id="p-timbro" alt="" width="300" height="300" hidden decoding="async">
       <div class="firma">
         <h1 id="nome" translate="no">{{NOME}}</h1>
         <p>{{SOTTOTITOLO}}</p>
@@ -25,6 +26,7 @@
           <p class="pannello-viaggio" id="p-viaggio">Oggi</p>
           <p class="pannello-anno" id="p-anno">{{ANNO}}</p>
         </div>
+        <p class="pannello-quando" id="p-quando" hidden></p>
         <p class="pannello-riga2" id="p-riga" data-predefinita="{{RIGA_OGGI_ATTR}}">{{RIGA_OGGI}}</p>
         <div class="pannello-extra">
           <span class="ruolo-pillola" id="p-ruolo" hidden>Tour leader</span>
@@ -40,7 +42,7 @@
   <div class="contenuto" id="contenuto">
     <section class="bio" aria-label="Chi sono">
       <p class="bio-attacco">{{BIO_ATTACCO}}</p>
-      <p class="bio-resto">{{BIO}}</p>
+      {{BIO}}
       <p class="bio-numeri">{{NUMERI}}</p>
     </section>
 

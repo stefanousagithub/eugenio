@@ -27,8 +27,10 @@ content:
       - { name: descrizione_foto_oggi, label: Descrizione della foto, type: string, description: "Per chi non vede le immagini (es. «Sugli scogli al tramonto, con una tazza in mano»)." }
       - { name: inquadratura_oggi, label: Inquadratura della foto, type: number, options: { min: 0, max: 100 }, description: "0 = mostra il lato sinistro della foto, 50 = centro, 100 = lato destro." }
       - { name: riga_oggi, label: Riga di oggi, type: string, description: "Sotto «Oggi». La prossima partenza viene aggiunta in automatico." }
-      - { name: bio_attacco, label: Frase d'apertura, type: string, required: true }
-      - { name: bio, label: Chi sono, type: text }
+      - { name: bio_attacco, label: Frase d'apertura, type: string, required: true, description: "Compare in corsivo sopra la presentazione, se non c'è una citazione." }
+      - { name: citazione, label: Citazione (facoltativa), type: text, description: "Qualche verso o una frase d'autore, una riga per verso. Se c'è, prende il posto della frase d'apertura." }
+      - { name: citazione_autore, label: Autore della citazione, type: string }
+      - { name: bio, label: Presentazione, type: text, description: "Lascia una riga vuota tra un paragrafo e l'altro." }
       - { name: motto, label: Motto in fondo alla pagina, type: string }
       - { name: instagram, label: Nome utente Instagram, type: string, description: "Senza @." }
       - { name: whatsapp, label: Numero WhatsApp, type: string, description: "Se lo inserisci, il pulsante principale diventa «Scrivimi su WhatsApp»." }
@@ -37,6 +39,8 @@ content:
       - { name: descrizione_sito, label: Descrizione per Google e per le anteprime dei link, type: text }
       - { name: indirizzo_sito, label: Indirizzo del sito, type: string, description: "Es. https://eugeniolucarelli.it. Serve per l'anteprima del link su WhatsApp." }
       - { name: online_su_google, label: Visibile su Google, type: boolean, description: "Lascia spento finché il sito non è pronto." }
+      - { name: link_decalogo, label: Link al decalogo di Avventure, type: string, description: "Compare sotto le partenze come «Prima di partire»." }
+      - { name: mostra_mappa, label: Mostra la mappa dei paesi, type: boolean, default: false }
       - name: recensioni
         label: Dal gruppo (frasi di chi ha viaggiato con te)
         type: object
@@ -65,11 +69,22 @@ content:
       - { name: titolo, label: Nome del viaggio, type: string, required: true, description: "Come sul sito di Avventure (es. Finlandia Aurore Boreali Discovery)." }
       - { name: destinazione, label: Destinazione breve, type: string, required: true, description: "Quella grande sulla carta d'imbarco (es. Finlandia)." }
       - { name: tappe, label: Tappe, type: string, description: "Es. Helsinki, Ivalo, Rovaniemi." }
+      - { name: descrizione, label: Descrizione, type: text, description: "Due o tre righe sul viaggio: compaiono sulla carta d'imbarco e sulla linea del tempo." }
       - { name: da, label: Città di partenza, type: string, default: Roma }
       - { name: dal, label: Partenza, type: date, required: true, options: { format: yyyy-MM-dd } }
       - { name: al, label: Ritorno, type: date, required: true, options: { format: yyyy-MM-dd } }
-      - { name: codice, label: Codice partenza Avventure, type: string, description: "Le 4 cifre (es. 3597). Con il codice, iscritti e posti si aggiornano da soli ogni giorno." }
+      - { name: codice, label: Codice partenza Avventure, type: string, description: "Le 4 cifre della partenza (es. 3597, 0791). Con il codice, iscritti e posti si aggiornano da soli ogni giorno." }
       - { name: tour_leader, label: Sono il tour leader, type: boolean, default: true }
+      - name: timbro
+        label: Timbro
+        type: select
+        description: "Il tuo logo sulla carta d'imbarco, al posto di «Tour leader: Eugenio»."
+        options:
+          values:
+            - { value: "", label: Nessuno }
+            - { value: freddo, label: Freddo (montagne e neve) }
+            - { value: natura, label: Natura (giungla e animali) }
+            - { value: mare, label: Mare (spiaggia e palme) }
       - { name: scheda, label: Link alla scheda del viaggio, type: string }
       - { name: iscrizione, label: Link per iscriversi, type: string, description: "Il link del pulsante «Prenota» di quella data sul sito di Avventure." }
       - { name: colore, label: Colore della carta d'imbarco, type: string, default: "#2b3caa", description: "Formato #RRGGBB, scuro (il testo sopra è bianco)." }
@@ -92,35 +107,30 @@ content:
         label: Tipo di viaggio
         type: select
         default: gruppo
-        description: "Di gruppo: sta sulla linea del tempo e nella griglia. Per conto mio: nella fila «Per conto mio» e sulla mappa."
+        description: "Di gruppo: sta sulla linea del tempo e nella griglia. In autonomia: nella fila «In autonomia»."
         options:
           values:
             - { value: gruppo, label: Di gruppo (Avventure nel Mondo) }
-            - { value: personale, label: Per conto mio }
-      - { name: anno, label: Anno, type: number, options: { min: 1990, max: 2100 }, description: "Obbligatorio per i viaggi di gruppo. Per quelli tuoi puoi lasciarlo vuoto." }
-      - name: mese
-        label: Mese
+            - { value: personale, label: In autonomia }
+      - { name: dal, label: Partenza, type: string, description: "AAAA-MM-GG (es. 2024-08-28). Se ricordi solo il mese: AAAA-MM (es. 2023-01). Obbligatoria per i viaggi di gruppo." }
+      - { name: al, label: Ritorno, type: string, description: "AAAA-MM-GG. Facoltativo." }
+      - { name: tour_leader, label: Ero il tour leader, type: boolean, default: false }
+      - name: timbro
+        label: Timbro (solo per i viaggi da tour leader)
         type: select
+        description: "Il logo che compare sulla foto quando il viaggio è scelto sulla linea del tempo."
         options:
           values:
-            - { value: 1, label: Gennaio }
-            - { value: 2, label: Febbraio }
-            - { value: 3, label: Marzo }
-            - { value: 4, label: Aprile }
-            - { value: 5, label: Maggio }
-            - { value: 6, label: Giugno }
-            - { value: 7, label: Luglio }
-            - { value: 8, label: Agosto }
-            - { value: 9, label: Settembre }
-            - { value: 10, label: Ottobre }
-            - { value: 11, label: Novembre }
-            - { value: 12, label: Dicembre }
-      - { name: tour_leader, label: Ero il tour leader, type: boolean, default: false }
+            - { value: "", label: Nessuno }
+            - { value: freddo, label: Freddo (montagne e neve) }
+            - { value: natura, label: Natura (giungla e animali) }
+            - { value: mare, label: Mare (spiaggia e palme) }
+      - { name: mostra, label: Mostra sul sito, type: boolean, default: true, description: "Per i viaggi in autonomia: spento, il viaggio resta salvato ma non compare." }
       - { name: paese, label: Paese, type: string, description: "In italiano, per la mappa e per contare i paesi (es. Spagna anche per Tenerife). Più paesi separati da virgola (es. Montenegro, Croazia)." }
       - { name: foto, label: Foto, type: image, description: "Una foto in cui ci sei tu. Viene ridimensionata e ripulita dai dati GPS in automatico." }
       - { name: inquadratura, label: Inquadratura della foto, type: number, default: 50, options: { min: 0, max: 100 }, description: "0 = lato sinistro, 50 = centro, 100 = lato destro." }
       - { name: colore, label: Colore (facoltativo), type: string, description: "Se lo lasci vuoto viene preso dalla foto." }
-      - { name: riga, label: Riga sotto il titolo, type: string, description: "Es. «Con Avventure nel Mondo, dal 7 al 14 dicembre.»" }
+      - { name: riga, label: Descrizione, type: text, description: "Due o tre righe sul viaggio. Le date si aggiungono da sole." }
       - { name: frase, label: Una tua frase su questo viaggio, type: string, description: "Facoltativa. Compare in corsivo." }
       - { name: scheda, label: Link alla scheda del viaggio, type: string }
       - { name: video, label: Link al video (reel Instagram), type: string, description: "Facoltativo. Incolla il link del reel, es. https://www.instagram.com/reel/XXXX/. Sul sito compare il pulsante «Guarda il video»." }

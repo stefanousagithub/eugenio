@@ -44,7 +44,11 @@ Questo file riassume il lavoro fatto in chat e dice cosa fare adesso, in che ord
 | CMS | Pages CMS ospitato (app.pagescms.org), Eugenio invitato come collaboratore via email |
 | Lavoro | Scrivere sempre "assistente di volo", mai il nome della compagnia aerea |
 | "Adesso sono in viaggio" | Solo se attivato nella singola partenza (`mostra_in_viaggio`). Lo decide Eugenio |
-| Tour leader | Marrakech Discovery 2025 e Lofoten Discovery 2024 (la Norvegia è **da confermare**) |
+| Tour leader | Lofoten 2024 e Marrakech 2025 fatti; Finlandia (dic 2026) e Costa Rica (gen 2027) in partenza. Codice tour leader 6836 |
+| Viaggi | «Di gruppo» (Avventure, sulla linea del tempo) separati da «In autonomia» (fila a parte, `mostra` decide quali si vedono). Dati e testi da Eugenio, 11/11/2026 |
+| Timbri | I tre loghi di Eugenio in `modello/timbri/` (freddo, natura, mare), solo sui viaggi da tour leader |
+| Mappa | Pronta ma spenta (`mostra_mappa: false` nel profilo) |
+| Citazione De Gregori | Campo `citazione` lasciato vuoto: i versi li inserisce Eugenio dal CMS |
 | Enoturismo | Nessuna sezione: non risulta dai dati di Eugenio |
 | Testi e foto | Li definirà Eugenio dal CMS. **Non inventare** frasi personali, numeri, iscritti |
 
@@ -157,8 +161,7 @@ Con il deploy via Actions il file `CNAME` non serve.
 | Cosa | Chi |
 |---|---|
 | Foto originali per ogni viaggio (meglio dal telefono, una per viaggio con lui) | Eugenio, dal CMS |
-| Anni dei viaggi senza data: Praga, Chefchaouen–Tangeri, Andalucía, Cipro, Grecia, Creta, Balcani, Georgia, Italia | Eugenio |
-| Conferma del viaggio in Norvegia da tour leader | Eugenio |
-| Numero WhatsApp: se inserito, il pulsante principale diventa WhatsApp | Eugenio |
-| Approvazione della bio (oggi è una bozza fatta solo di fatti dal suo profilo) | Eugenio |
+| Quali viaggi in autonomia mostrare (oggi: quelli con foto o video) | Eugenio e Stefano |
+| Circa 4 foto per ogni viaggio di Avventure; foto della Cambogia | Eugenio |
+| Timbro giusto per Marrakech (oggi «natura») | Eugenio |
 | Dominio | Eugenio e Stefano, fase G |
