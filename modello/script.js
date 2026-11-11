@@ -331,6 +331,7 @@ if (fatti.length >= 2) {
     dettaglio.dataset.da = "p-leggi"; dettaglio.showModal();
   });
   $("#dettaglio-chiudi").addEventListener("click", () => dettaglio.close());
+  $("#dettaglio-ok").addEventListener("click", () => dettaglio.close());
   dettaglio.addEventListener("click", e => { if (e.target === dettaglio) dettaglio.close(); });
   $("#dettaglio-carta").addEventListener("click", () => dettaglio.close());
   dettaglio.addEventListener("close", () => $("#p-leggi").focus());
