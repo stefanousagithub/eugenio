@@ -88,7 +88,8 @@ const tessere = [...document.querySelectorAll("#griglia > li")];
 const fatti = tessere.map(li => ({
   titolo: li.dataset.titolo, anno: +li.dataset.anno, mese: +li.dataset.mese || 1, guida: li.dataset.guida === "si",
   c: li.dataset.c, foto: li.dataset.foto, pos: li.dataset.pos || "50", riga: li.dataset.riga, frase: li.dataset.frase, slug: li.dataset.slug, video: li.dataset.video || "",
-  quando: li.dataset.quando || "", timbro: li.dataset.timbro || "", ordine: +li.dataset.ordine || 0
+  quando: li.dataset.quando || "", timbro: li.dataset.timbro || "", ordine: +li.dataset.ordine || 0,
+  galleria: (li.dataset.galleria || "").split(",").filter(Boolean)
 })).sort((a, b) => a.ordine - b.ordine); // la griglia va dal più recente, la linea del tempo dal più vecchio
 const prossimo = futuri[0];
 const rigaBase = $("#p-riga").dataset.predefinita;
@@ -322,6 +323,21 @@ if (fatti.length >= 2) {
     const v = voci[corrente]; fermaLapse();
     const box = $("#dettaglio-foto"); box.style.setProperty("--c", v.c || coloreOggi);
     const im = $("#dettaglio-img"); im.hidden = !v.foto; if (v.foto) { im.src = src(v); im.style.objectPosition = `${v.pos}% 50%`; }
+    // più foto: si sfogliano (col dito, con le frecce, con i puntini)
+    box.querySelector(".dettaglio-scorri")?.remove(); box.querySelector(".puntini")?.remove();
+    box.classList.toggle("con-galleria", (v.galleria || []).length > 1);
+    if ((v.galleria || []).length > 1) {
+      im.hidden = true;
+      const fila = document.createElement("div"); fila.className = "dettaglio-scorri";
+      fila.innerHTML = v.galleria.map((g, k) => `<img src="foto/${g}.webp" alt="" decoding="async" loading="${k ? "lazy" : "eager"}">`).join("");
+      const pt = document.createElement("span"); pt.className = "puntini";
+      pt.innerHTML = v.galleria.map((_, k) => `<i${k ? "" : ' class="attivo"'}></i>`).join("");
+      box.prepend(fila); box.append(pt);
+      fila.addEventListener("scroll", () => {
+        const k = Math.round(fila.scrollLeft / fila.clientWidth);
+        pt.querySelectorAll("i").forEach((p, j) => p.classList.toggle("attivo", j === k));
+      }, { passive: true });
+    }
     const tb = $("#dettaglio-timbro"); tb.hidden = !v.timbro; if (v.timbro) tb.src = `timbri/${v.timbro}.webp`;
     $("#dettaglio-titolo").textContent = v.titolo;
     $("#dettaglio-quando").textContent = v.quando || String(v.anno);
@@ -332,6 +348,11 @@ if (fatti.length >= 2) {
   });
   $("#dettaglio-chiudi").addEventListener("click", () => dettaglio.close());
   $("#dettaglio-ok").addEventListener("click", () => dettaglio.close());
+  dettaglio.querySelectorAll(".dettaglio-freccia").forEach(b => b.addEventListener("click", () => {
+    const fila = dettaglio.querySelector(".dettaglio-scorri"); if (!fila) return;
+    const n = fila.children.length, k = Math.round(fila.scrollLeft / fila.clientWidth) + +b.dataset.dir;
+    fila.scrollTo({ left: ((k + n) % n) * fila.clientWidth, behavior: ridotto ? "auto" : "smooth" });
+  }));
   dettaglio.addEventListener("click", e => { if (e.target === dettaglio) dettaglio.close(); });
   $("#dettaglio-carta").addEventListener("click", () => dettaglio.close());
   dettaglio.addEventListener("close", () => $("#p-leggi").focus());
@@ -417,13 +438,45 @@ document.querySelectorAll(".miei").forEach(ul => {
   ul.querySelectorAll("img").forEach(im => im.addEventListener("load", disponi, { once: true }));
 });
 
-/* ---------------- viaggi di gruppo: la foto si assesta (zoom lento) quando la scheda entra nello schermo ---------------- */
-if ("IntersectionObserver" in window && !ridotto) {
-  const ossTessere = new IntersectionObserver(voci => voci.forEach(v => {
-    if (v.isIntersecting) { v.target.classList.add("vista"); ossTessere.unobserve(v.target); }
-  }), { threshold: .25 });
-  document.querySelectorAll(".griglia .tessera").forEach(t => ossTessere.observe(t));
-} else document.querySelectorAll(".griglia .tessera").forEach(t => t.classList.add("vista"));
+/* ---------------- viaggi di gruppo: le foto di ogni scheda si alternano da sole ----------------
+   Dissolvenza lenta, schede sfasate tra loro, solo quando sono sullo schermo. Col mouse sopra si fermano;
+   col dito si scorre a destra e a sinistra (senza aprire il viaggio). Con «riduci movimento» niente giro automatico. */
+document.querySelectorAll(".griglia .tessera").forEach((t, n) => {
+  const quadri = [...t.querySelectorAll(".galleria > picture")], punti = [...t.querySelectorAll(".puntini i")];
+  let i = 0, timer = null, visibile = false, sopra = false, pausaFino = 0;
+  const vai = k => {
+    if (quadri.length < 2) return;
+    quadri[i].classList.remove("attiva"); punti[i]?.classList.remove("attivo");
+    i = (k + quadri.length) % quadri.length;
+    const img = quadri[i].querySelector("img"); if (img) img.loading = "eager";
+    quadri[i].classList.add("attiva"); punti[i]?.classList.add("attivo");
+    const dopo = quadri[(i + 1) % quadri.length]?.querySelector("img"); if (dopo) dopo.loading = "eager"; // la prossima è già pronta
+  };
+  const giro = () => {
+    clearTimeout(timer);
+    if (ridotto || quadri.length < 2 || !visibile) return;
+    timer = setTimeout(() => { if (!sopra && Date.now() > pausaFino) vai(i + 1); giro(); }, 4200);
+  };
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([v]) => {
+      visibile = v.isIntersecting;
+      if (visibile) { t.classList.add("vista"); clearTimeout(timer); timer = setTimeout(giro, 900 + (n % 3) * 1300); }
+      else clearTimeout(timer);
+    }, { threshold: .35 }).observe(t);
+  } else t.classList.add("vista");
+  t.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") sopra = true; });
+  t.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") sopra = false; });
+  // scorrere col dito sulla scheda: cambia foto e non apre il viaggio
+  let x0 = null, y0 = 0, scorso = false;
+  t.addEventListener("pointerdown", e => { x0 = e.clientX; y0 = e.clientY; scorso = false; });
+  t.addEventListener("pointerup", e => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (quadri.length > 1 && Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy) * 1.3) { scorso = true; vai(i + (dx < 0 ? 1 : -1)); pausaFino = Date.now() + 8000; }
+  });
+  t.addEventListener("click", e => { if (scorso) { e.preventDefault(); e.stopImmediatePropagation(); scorso = false; } }, true);
+  t.style.touchAction = "pan-y";
+});
 
 /* ---------------- carta d'imbarco: tabellone a palette e volo ---------------- */
 // le lettere scorrono in ordine come su un tabellone delle partenze, poi si fermano; l'aereo percorre la rotta.

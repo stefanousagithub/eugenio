@@ -7,15 +7,20 @@
     "tour_leader": false,
     "timbro": "",
     "paese": "Cambogia",
-    "foto": "",
+    "foto": "/foto/caricate/viaggi/cambogia-1.jpg",
     "inquadratura": 50,
-    "colore": "#7a4a16",
+    "colore": "",
     "riga": "Un itinerario dinamico che unisce spiritualità antica e natura tropicale, dalla maestosità millenaria del complesso di Angkor Wat alla vita autentica lungo i villaggi palafitticoli.",
     "frase": "",
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/cambogia-2.jpg",
+      "/foto/caricate/viaggi/cambogia-3.jpg",
+      "/foto/caricate/viaggi/cambogia-4.jpg"
+    ]
   },
   {
     "titolo": "Jamaica Express",
@@ -25,7 +30,7 @@
     "tour_leader": false,
     "timbro": "",
     "paese": "Giamaica",
-    "foto": "/foto/caricate/jamaica-2023.jpg",
+    "foto": "/foto/caricate/viaggi/jamaica-1.jpg",
     "inquadratura": 50,
     "colore": "",
     "riga": "Un viaggio «on the road» ritmato dalle vibrazioni del reggae e dal calore della cultura caraibica, per vivere appieno l’anima dell’isola, tra cascate immerse nella giungla e spiagge incontaminate.",
@@ -33,7 +38,12 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/jamaica-2.jpg",
+      "/foto/caricate/viaggi/jamaica-3.jpg",
+      "/foto/caricate/viaggi/jamaica-4.jpg"
+    ]
   },
   {
     "titolo": "Cappadocia Discovery",
@@ -43,7 +53,7 @@
     "tour_leader": false,
     "timbro": "",
     "paese": "Turchia",
-    "foto": "/foto/caricate/cappadocia-2023.jpg",
+    "foto": "/foto/caricate/viaggi/cappadocia-1.jpg",
     "inquadratura": 50,
     "colore": "",
     "riga": "Un’avventura fiabesca dall’antica Istanbul ai paesaggi lunari della Turchia centrale, volando in mongolfiera sulle vallate scolpite dal vento e scoprendo città sotterranee ricche di storia.",
@@ -51,7 +61,12 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/Cx3W3qdMjx4/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/cappadocia-2.jpg",
+      "/foto/caricate/viaggi/cappadocia-3.jpg",
+      "/foto/caricate/viaggi/cappadocia-4.jpg"
+    ]
   },
   {
     "titolo": "Isole Lofoten Discovery",
@@ -61,7 +76,7 @@
     "tour_leader": true,
     "timbro": "freddo",
     "paese": "Norvegia",
-    "foto": "/foto/caricate/lofoten-2024.jpg",
+    "foto": "/foto/caricate/viaggi/lofoten-1.jpg",
     "inquadratura": 50,
     "colore": "",
     "riga": "Prima esperienza da coordinatore, guidando il gruppo tra maestosi fiordi a picco sul mare, villaggi di pescatori (i caratteristici rorbu) e trekking mozzafiato. Un viaggio sicuramente dall’anima selvaggia.",
@@ -69,7 +84,12 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/C_7z6ynuo1r/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/lofoten-2.jpg",
+      "/foto/caricate/viaggi/lofoten-3.jpg",
+      "/foto/caricate/viaggi/lofoten-4.jpg"
+    ]
   },
   {
     "titolo": "Thai Discovery",
@@ -79,7 +99,7 @@
     "tour_leader": false,
     "timbro": "",
     "paese": "Thailandia",
-    "foto": "/foto/caricate/thailandia-2025.jpg",
+    "foto": "/foto/caricate/viaggi/thai-1.jpg",
     "inquadratura": 50,
     "colore": "",
     "riga": "Un grande classico del viaggio itinerante che combina l’energia caotica di Bangkok, i templi e la giungla del Nord (Chiang Mai e Chiang Rai) con il relax sulle isole del Sud.",
@@ -87,7 +107,12 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/DHEhQ2HuP6g/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/thai-2.jpg",
+      "/foto/caricate/viaggi/thai-3.jpg",
+      "/foto/caricate/viaggi/thai-4.jpg"
+    ]
   },
   {
     "titolo": "Marrakech Discovery",
@@ -97,15 +122,20 @@
     "tour_leader": true,
     "timbro": "natura",
     "paese": "Marocco",
-    "foto": "/foto/caricate/marrakech-2025.jpg",
-    "inquadratura": 40,
+    "foto": "/foto/caricate/viaggi/marrakech-1.jpg",
+    "inquadratura": 50,
     "colore": "",
     "riga": "Una full immersion sensoriale di una settimana in Marocco, guidando il gruppo tra i profumi e il caos affascinante dei souk e della piazza Djemaa el-Fna di Marrakech, passando per la zona desertica di Merzouga, fino ad immergersi nei mille colori di Fes.",
     "frase": "",
     "scheda": "",
     "video": "https://www.instagram.com/reel/DSdISubDMzi/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": [
+      "/foto/caricate/viaggi/marrakech-2.jpg",
+      "/foto/caricate/viaggi/marrakech-3.jpg",
+      "/foto/caricate/viaggi/marrakech-4.jpg"
+    ]
   },
   {
     "titolo": "Stati Uniti",
@@ -123,7 +153,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   },
   {
     "titolo": "Bahamas",
@@ -141,7 +172,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   },
   {
     "titolo": "Messico",
@@ -159,7 +191,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Cipro",
@@ -177,7 +210,8 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/Csx3FQpLgl4/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Malta",
@@ -195,7 +229,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   },
   {
     "titolo": "Tangeri e Chefchaouen",
@@ -213,7 +248,8 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/C4F0mzbs_kF/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Tenerife",
@@ -231,7 +267,8 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/C91sjmtuTC9/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Georgia",
@@ -249,7 +286,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   },
   {
     "titolo": "Cammino di Santiago",
@@ -267,7 +305,8 @@
     "scheda": "",
     "video": "https://www.instagram.com/reel/DWq-fOtDEhi/",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Lanzarote",
@@ -285,7 +324,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": true
+    "mostra": true,
+    "galleria": []
   },
   {
     "titolo": "Creta",
@@ -303,7 +343,8 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   },
   {
     "titolo": "Balcani",
@@ -321,6 +362,7 @@
     "scheda": "",
     "video": "",
     "credito_foto": "",
-    "mostra": false
+    "mostra": false,
+    "galleria": []
   }
 ]

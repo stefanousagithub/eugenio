@@ -127,7 +127,8 @@ content:
             - { value: mare, label: Mare (spiaggia e palme) }
       - { name: mostra, label: Mostra sul sito, type: boolean, default: true, description: "Per i viaggi in autonomia: spento, il viaggio resta salvato ma non compare." }
       - { name: paese, label: Paese, type: string, description: "In italiano, per la mappa e per contare i paesi (es. Spagna anche per Tenerife). Più paesi separati da virgola (es. Montenegro, Croazia)." }
-      - { name: foto, label: Foto, type: image, description: "Una foto in cui ci sei tu. Viene ridimensionata e ripulita dai dati GPS in automatico." }
+      - { name: foto, label: Foto principale, type: image, description: "La prima foto: compare grande sulla linea del tempo e sulla scheda. Viene ridimensionata e ripulita dai dati GPS in automatico." }
+      - { name: galleria, label: Altre foto, type: image, list: true, description: "Per i viaggi di gruppo: 3 o 4 foto in più. Sulla scheda si alternano da sole e in «Leggi tutto» si sfogliano." }
       - { name: inquadratura, label: Inquadratura della foto, type: number, default: 50, options: { min: 0, max: 100 }, description: "0 = lato sinistro, 50 = centro, 100 = lato destro." }
       - { name: colore, label: Colore (facoltativo), type: string, description: "Se lo lasci vuoto viene preso dalla foto." }
       - { name: riga, label: Descrizione, type: text, description: "Due o tre righe sul viaggio. Le date si aggiungono da sole." }

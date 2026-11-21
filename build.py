@@ -293,20 +293,32 @@ def main():
     for ordine, v in reversed(list(enumerate(gruppo))):
         copertina = ordine == len(gruppo) - 1
         info = foto(v.get("foto"), v["_slug"], f"Viaggio {v['titolo']}")
+        # galleria: la copertina e le altre foto del viaggio, che sulla scheda si alternano da sole
+        galleria = [info] if info else []
+        for k, g in enumerate(v.get("galleria") or [], 2):
+            gi = foto(g, f'{v["_slug"]}-{k}', f"Viaggio {v['titolo']}, foto {k}")
+            if gi:
+                galleria.append(gi)
         colore = v.get("colore") or (info and info["colore"]) or "#2c2c2e"
         guida = "si" if v.get("tour_leader") else "no"
         video = video_instagram(v.get("video"), f"Viaggio {v['titolo']}")
-        attr = (f'data-ordine="{ordine}" data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
+        attr = (f'data-ordine="{ordine}" data-galleria="{",".join(g["nome"] for g in galleria)}" data-slug="{v["_slug"]}" data-titolo="{e(v["titolo"])}" data-anno="{v["anno"]}" data-mese="{v.get("mese") or 1}" '
                 f'data-guida="{guida}" data-c="{colore}" data-foto="{v["_slug"] if info else ""}" '
                 f'data-pos="{int(v.get("inquadratura") or 50)}" data-riga="{e(v.get("riga", ""))}" data-frase="{e(v.get("frase", ""))}" data-video="{e(video)}" '
                 f'data-quando="{e(v["_quando"])}" data-timbro="{e(v.get("timbro") or "")}"')
         immagine = ""
-        if info:
+        if galleria:
             cartella = "" if copertina else "mini/"
-            w, h = (info["w"], info["h"]) if copertina else (info["mw"], info["mh"])
-            immagine = (f'<picture><source srcset="foto/{cartella}{info["nome"]}.webp" type="image/webp"><img src="foto/{cartella}{info["nome"]}.jpg" '
-                        f'width="{w}" height="{h}" alt="" loading="lazy" decoding="async" '
-                        f'style="object-position:{int(v.get("inquadratura") or 50)}% 50%"></picture>')
+            quadri = []
+            for k, g in enumerate(galleria):
+                w, h = (g["w"], g["h"]) if copertina else (g["mw"], g["mh"])
+                pos = f' style="object-position:{int(v.get("inquadratura") or 50)}% 50%"' if k == 0 else ""
+                quadri.append(f'<picture{" class=\"attiva\"" if k == 0 else ""}><source srcset="foto/{cartella}{g["nome"]}.webp" type="image/webp">'
+                              f'<img src="foto/{cartella}{g["nome"]}.jpg" width="{w}" height="{h}" alt="" loading="lazy" decoding="async"{pos}></picture>')
+            immagine = f'<span class="galleria">{"".join(quadri)}</span>'
+            if len(galleria) > 1:
+                immagine += ('<span class="puntini" aria-hidden="true">'
+                             + "".join(f'<i{" class=\"attivo\"" if k == 0 else ""}></i>' for k in range(len(galleria))) + '</span>')
         timbro = v.get("timbro") if v.get("timbro") in TIMBRI else ""
         if timbro:
             segno = f'<img class="tessera-timbro" src="timbri/{timbro}.webp" width="300" height="300" alt="Tour leader" loading="lazy" decoding="async">'
