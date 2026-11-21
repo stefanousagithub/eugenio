@@ -7,7 +7,7 @@
     "tour_leader": false,
     "timbro": "",
     "paese": "Cambogia",
-    "foto": "/foto/caricate/viaggi/cambogia-1.jpg",
+    "foto": "/foto/caricate/viaggi/cambogia-4.jpg",
     "inquadratura": 50,
     "colore": "",
     "riga": "Un itinerario dinamico che unisce spiritualità antica e natura tropicale, dalla maestosità millenaria del complesso di Angkor Wat alla vita autentica lungo i villaggi palafitticoli.",
@@ -17,9 +17,9 @@
     "credito_foto": "",
     "mostra": true,
     "galleria": [
+      "/foto/caricate/viaggi/cambogia-1.jpg",
       "/foto/caricate/viaggi/cambogia-2.jpg",
-      "/foto/caricate/viaggi/cambogia-3.jpg",
-      "/foto/caricate/viaggi/cambogia-4.jpg"
+      "/foto/caricate/viaggi/cambogia-3.jpg"
     ]
   },
   {
@@ -36,7 +36,7 @@
     "riga": "Un viaggio «on the road» ritmato dalle vibrazioni del reggae e dal calore della cultura caraibica, per vivere appieno l’anima dell’isola, tra cascate immerse nella giungla e spiagge incontaminate.",
     "frase": "",
     "scheda": "",
-    "video": "",
+    "video": "https://www.instagram.com/reel/CpqLS9VDJtT/",
     "credito_foto": "",
     "mostra": true,
     "galleria": [
